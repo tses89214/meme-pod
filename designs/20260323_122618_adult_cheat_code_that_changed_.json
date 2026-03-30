@@ -1,0 +1,32 @@
+{
+  "concept": "adult cheat code that changed your life",
+  "generated_at": "20260323_122618",
+  "prompts": [
+    {
+      "concept": "adult cheat code that changed your life",
+      "style": "bold_minimal",
+      "style_desc": "粗體極簡黑白",
+      "prompt": "Text-only t-shirt design, \"adult cheat code that changed your life\", bold sans-serif font, black text on white background, minimalist, centered layout, no illustrations, clean typography, print-ready, high contrast",
+      "negative_prompt": "no photos, no people, no faces, no complex illustrations, no gradients, no watermark, no background pattern, simple and clean only",
+      "ideogram_settings": {
+        "aspect_ratio": "ASPECT_1_1",
+        "model": "V_2_TURBO",
+        "magic_prompt_option": "OFF",
+        "style_type": "DESIGN"
+      }
+    },
+    {
+      "concept": "adult cheat code that changed your life",
+      "style": "corporate_parody",
+      "style_desc": "企業惡搞風",
+      "prompt": "Corporate parody t-shirt, \"adult cheat code that changed your life\", fake professional logo style, clean sans-serif, mockingly formal layout, office humor aesthetic, black and white, no real logos, print-ready",
+      "negative_prompt": "no photos, no people, no faces, no complex illustrations, no gradients, no watermark, no background pattern, simple and clean only",
+      "ideogram_settings": {
+        "aspect_ratio": "ASPECT_1_1",
+        "model": "V_2_TURBO",
+        "magic_prompt_option": "OFF",
+        "style_type": "DESIGN"
+      }
+    }
+  ]
+}
