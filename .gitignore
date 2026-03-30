@@ -8,6 +8,6 @@ __pycache__/
 *.pyc
 _tmp_meta.json
 .claude/
-fonts/*.zip
+fonts/
 designs/
 trends/
