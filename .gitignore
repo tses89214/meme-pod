@@ -1,0 +1,13 @@
+.drive_token.pickle
+.drive_verifier.txt
+.upload_queue.json
+.last_meme_session.json
+rb_session.json
+output/
+__pycache__/
+*.pyc
+_tmp_meta.json
+.claude/
+fonts/
+designs/
+trends/
