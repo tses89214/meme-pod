@@ -7,3 +7,7 @@ output/
 __pycache__/
 *.pyc
 _tmp_meta.json
+.claude/
+fonts/*.zip
+designs/
+trends/
