@@ -1,7 +1,7 @@
 # PROGRESS
 
-## 目前狀態（2026-08-03）
-Redbubble 自動上傳除錯告一段落，暫停等使用者帶自己寫好的爬蟲腳本回來 import。
+## 目前狀態（2026-08-04）
+使用者帶回自己寫的填表腳本，Tags 欄位選擇器卡點解掉了，已移植進 `rb_upload.py`（見 DECISIONS.md 2026-08-04）。還沒補：換圖（Replace all images / `select-image-large_clothing`）跟實際跑一次全流程驗證。
 Pinterest 導流計畫 Phase 1（手動測水溫）規格已定案，寫成 `skills/meme-pinterest.md`，10 支素材已備好文案交給使用者，網址/mockup 圖使用者手動處理中。
 
 ## 已完成
@@ -16,6 +16,7 @@ Pinterest 導流計畫 Phase 1（手動測水溫）規格已定案，寫成 `ski
 - `.gitignore` 補上 `.rb_chrome_profile/`（內含登入 session/cookie，不可進版控）。
 
 ## 下一步（下次會話上班打卡先看這）
-- 使用者要帶自己寫好的爬蟲腳本回來，import 進 `rb_upload.py`，取代目前手動摸索的 duplicate 流程填表邏輯（Tags 欄位那段最可能還是卡點）。
+- `fill_design()` 還缺換圖那段（duplicate 頁面的 `select-image-large_clothing`，目前 `upload_image()` 用的是 `#select-image-single`，那是原本 New Work 頁的，duplicate 頁可能不適用，要重新確認）。
+- 補完後要在 duplicate 頁面實際跑一次全流程（黑範本或白範本各一次），submit=False 先截圖人工檢查排版比例對不對，過了才試 --submit。
 - Pinterest：等使用者自己抓好 10 支的商品網址+mockup 圖，串上 UTM 後手動貼上 Pinterest；3-4 週後回顧流量訊號。
 - `upload_metadata.json` 目前有未 commit 的修改（session 開始前就存在，非本次會話所改），不是本次工作範圍，下次動它前先跟使用者確認內容。
