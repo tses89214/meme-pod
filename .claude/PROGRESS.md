@@ -1,7 +1,9 @@
 # PROGRESS
 
 ## 目前狀態（2026-08-04）
-使用者帶回自己寫的填表腳本，Tags 欄位選擇器卡點解掉了，已移植進 `rb_upload.py`（見 DECISIONS.md 2026-08-04）。還沒補：換圖（Replace all images / `select-image-large_clothing`）跟實際跑一次全流程驗證。
+Redbubble duplicate 上傳全流程已跑通並實測成功（黑範本 + My faith is beer 設計，submit=False）：換圖、四語言 title/tags/description、版權框都正確。換圖 selector 修正為 `#select-image-base`。詳見 DECISIONS.md 2026-08-04。
+發現換圖後 Redbubble 重算 mockup 很吃時間（實測近 20 分鐘），研判是後端固有成本非程式問題，排程時間要抓寬一點。
+還沒做：實際 submit 送出測試、白範本那邊沒測過、大量批次跑的穩定性沒驗證。
 Pinterest 導流計畫 Phase 1（手動測水溫）規格已定案，寫成 `skills/meme-pinterest.md`，10 支素材已備好文案交給使用者，網址/mockup 圖使用者手動處理中。
 
 ## 已完成

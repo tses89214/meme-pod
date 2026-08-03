@@ -23,7 +23,7 @@
 - Duplicate 網址：`https://www.redbubble.com/portfolio/images/<work_id>-<slug>/duplicate`
 - 該頁面過 Cloudflare 需要等（實測 30-90 秒，非死擋，純等待即可，不用人手動點驗證框）
 - 該頁面欄位 id 跟原本 New Work 表單共用：`#work_title_{lang}`、`#work_description_{lang}`（lang: en/de/fr/es）
-- 換圖：`#select-image-large_clothing`（畫面上「Replace all images」按鈕對應的 input，可能需要確認是否要連動填其他 product-type 的 image input）— 這部分使用者的腳本沒包含，仍待補。
+- 換圖：`#select-image-base`（使用者用瀏覽器 DOM 檢查器實測確認，不是 `select-image-large_clothing`——這個選錯了圖片不會真的換掉，但也不會報錯，要看截圖才會發現）。
 - 版權確認框：`#rightsDeclaration`（checkbox，name="rights_declaration"）— 已接進 `fill_design()`，送出前自動勾選。
 - 送出鈕：`#submit-work`（跟原本 New Work 表單相同）
 
@@ -36,3 +36,12 @@
 - 這頁的 React 欄位 plain `.clear()` 常清不乾淨：改用「JS 清空 value + Ctrl+A+Backspace + 硬送 30 次 Backspace」保底再輸入（`clear_and_input()`），Title/Main tag/Supporting tags/Description 都套用同一招。
 
 還沒補的：換圖（`select-image-large_clothing`）跟實際跑一次全流程驗證。
+
+## 2026-08-04 — Redbubble 全流程實測結果：換圖選擇器修正、換圖後極慢是正常現象
+用「My faith is beer」(fredoka 字型) 對黑底範本 (179795066) 實測 `fill_design()` 全流程（submit=False）：
+- 換圖 selector 修正為 `#select-image-base`（使用者實測確認），修正前用 `select-image-large_clothing` 不會報錯但圖沒真的換掉，容易誤判成功。
+- 四語言 title/main tag/supporting tags/description 全部正確填入，版權框正確勾選，範本原本的分類設定（media type、collections）有跟著複製過來，符合預期。
+- 把 Title/Description 的清空後輸入從 `send_keys()` 逐字打字改成 JS 原生 setter + dispatch `input`/`change` 事件（`clear_and_input()` 內），這段本身是有效加速，但不是這次耗時的主因。
+- 真正的耗時主因：用 `#select-image-base` 真的觸發換圖後，Redbubble 要重算幾十種商品類型的 mockup，頁面忙碌導致後續每個操作都變慢，全流程跑了約 1173 秒（近 20 分鐘）。換錯圖（不觸發真實處理）的那次只要幾十秒。這個延遲研判是 Redbubble 後端/前端處理圖片的固有成本，換人手動操作大概也要等類似時間，不是腳本效率問題，之後排程批次上架要把這個時間成本算進去。
+
+還沒做：實際按下 submit-work 送出測試（目前都停在 submit=False 的確認畫面）。
