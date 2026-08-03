@@ -100,36 +100,32 @@ def wait_for(driver, selector, timeout=15):
     )
 
 
-def fill_field(driver, selector, text, clear=True):
-    from selenium.webdriver.common.by import By
-    el = driver.find_element(By.CSS_SELECTOR, selector)
-    if clear:
-        el.clear()
+LANGUAGE_TAB_XPATH = {
+    "de": '//*[@id="add-new-work"]/div/div[2]/div/div/label[2]/h3',
+    "fr": '//*[@id="add-new-work"]/div/div[2]/div/div/label[3]/h3',
+    "es": '//*[@id="add-new-work"]/div/div[2]/div/div/label[4]/h3',
+}
+
+
+def clear_and_input(driver, el, text):
+    """React 控制的欄位，plain .clear() 常常清不乾淨，用 JS 清空 + 全選刪除 + 硬送 30 次 Backspace 保底。"""
+    from selenium.webdriver.common.keys import Keys
+    el.click()
+    driver.execute_script("arguments[0].value = ''", el)
+    el.send_keys(Keys.CONTROL, "a")
+    el.send_keys(Keys.BACKSPACE)
+    for _ in range(30):
+        el.send_keys(Keys.BACKSPACE)
     el.send_keys(text)
 
 
-def add_tags(driver, field_selector, tags: list):
-    """在 React tag input 輸入標籤（每個按 Enter）。"""
-    from selenium.webdriver.common.by import By
-    from selenium.webdriver.common.keys import Keys
-    try:
-        el = driver.find_element(By.CSS_SELECTOR, field_selector)
-        el.click()
-        for tag in tags:
-            el.send_keys(tag)
-            time.sleep(0.3)
-            el.send_keys(Keys.RETURN)
-            time.sleep(0.3)
-    except Exception as e:
-        print(f"  ⚠️  Tags {field_selector}: {e}")
-
-
 def click_language_tab(driver, lang: str):
-    """點擊語言 tab（en/de/fr/es）。"""
+    """點擊語言 tab（en 是預設 tab 不用點）。"""
     from selenium.webdriver.common.by import By
+    if lang not in LANGUAGE_TAB_XPATH:
+        return
     try:
-        tab = driver.find_element(By.CSS_SELECTOR, f"label[for='language-tab-{lang}']")
-        tab.click()
+        driver.find_element(By.XPATH, LANGUAGE_TAB_XPATH[lang]).click()
         time.sleep(0.5)
     except Exception as e:
         print(f"  ⚠️  Language tab {lang}: {e}")
@@ -186,26 +182,57 @@ def fill_design(driver, meta: dict, image_path: str, submit: bool = False):
 
         # Title
         try:
-            fill_field(driver, f"#work_title_{lang}", t.get("title", ""))
+            el = driver.find_element(By.CSS_SELECTOR, f"#work_title_{lang}")
+            clear_and_input(driver, el, t.get("title", ""))
             print(f"  ✏️  [{lang}] title: {t.get('title', '')}")
         except Exception as e:
             print(f"  ⚠️  title_{lang}: {e}")
 
+        # Main tag
+        try:
+            el = driver.find_element(By.CSS_SELECTOR, f"#main-tag-{lang}")
+            el.click()
+            for _ in range(30):
+                el.send_keys(Keys.BACKSPACE)
+            el.send_keys(t.get("main_tag", ""))
+            el.send_keys(Keys.ENTER)
+            print(f"  🏷️  [{lang}] main_tag: {t.get('main_tag', '')}")
+        except Exception as e:
+            print(f"  ⚠️  main_tag_{lang}: {e}")
+
+        # Supporting tags
+        try:
+            tags = t.get("tags", [])
+            el = driver.find_element(By.CSS_SELECTOR, f"#supporting-tags-{lang}")
+            el.click()
+            for _ in range(30):
+                el.send_keys(Keys.BACKSPACE)
+            el.send_keys(",".join(tags))
+            el.send_keys(Keys.ENTER)
+            el.send_keys(Keys.ESCAPE)
+            print(f"  🏷️  [{lang}] tags: {', '.join(tags)}")
+        except Exception as e:
+            print(f"  ⚠️  supporting_tags_{lang}: {e}")
+
         # Description
         try:
-            fill_field(driver, f"#work_description_{lang}", t.get("description", ""))
+            el = driver.find_element(By.CSS_SELECTOR, f"#work_description_{lang}")
+            clear_and_input(driver, el, t.get("description", ""))
             print(f"  ✏️  [{lang}] description: OK")
         except Exception as e:
             print(f"  ⚠️  description_{lang}: {e}")
 
-        # Tags
-        tags = t.get("tags", [])
-        if tags:
-            add_tags(driver, f"#work_tag_field_{lang}", tags)
-            print(f"  🏷️  [{lang}] tags: {', '.join(tags)}")
-
     # 3. Enable all products
     enable_all_products(driver)
+
+    # 3b. 版權確認框（Save Work 送出前必須勾）
+    try:
+        checkbox = driver.find_element(By.CSS_SELECTOR, "#rightsDeclaration")
+        if not checkbox.is_selected():
+            checkbox.click()
+        print("  ☑️  已勾選版權確認")
+    except Exception as e:
+        print(f"  ⚠️  rightsDeclaration: {e}")
 
     # 4. 截圖確認
     screenshot = BASE_DIR / "_rb_preview.png"

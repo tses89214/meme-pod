@@ -23,9 +23,16 @@
 - Duplicate 網址：`https://www.redbubble.com/portfolio/images/<work_id>-<slug>/duplicate`
 - 該頁面過 Cloudflare 需要等（實測 30-90 秒，非死擋，純等待即可，不用人手動點驗證框）
 - 該頁面欄位 id 跟原本 New Work 表單共用：`#work_title_{lang}`、`#work_description_{lang}`（lang: en/de/fr/es）
-- 換圖：`#select-image-large_clothing`（畫面上「Replace all images」按鈕對應的 input，可能需要確認是否要連動填其他 product-type 的 image input）
-- 版權確認框：`#rightsDeclaration`（checkbox，name="rights_declaration"）
+- 換圖：`#select-image-large_clothing`（畫面上「Replace all images」按鈕對應的 input，可能需要確認是否要連動填其他 product-type 的 image input）— 這部分使用者的腳本沒包含，仍待補。
+- 版權確認框：`#rightsDeclaration`（checkbox，name="rights_declaration"）— 已接進 `fill_design()`，送出前自動勾選。
 - 送出鈕：`#submit-work`（跟原本 New Work 表單相同）
-- 卡住的地方：Tags 欄位（`#work_tag_editor_{lang}`）在這頁是隱藏 input + React pill 元件，不是原本 New Work 表單那種可以直接打字按 Enter 的欄位，還沒摸清楚怎麼用 Selenium 可靠操作。
 
-現況：使用者說會自己帶一份寫好的爬蟲腳本回來，到時候直接 import 進 `rb_upload.py`，取代這裡未完成的摸索。此決策記錄先保留已驗證的部分，避免下次從頭來過。
+## 2026-08-04 — Redbubble Tags 欄位選擇器：用使用者原本寫好的邏輯解掉
+使用者帶回自己先前用 DrissionPage 寫的「填寫產品資訊」腳本（不含上傳圖片、不含勾框送出）。決定：只擷取邏輯移植進現有 `rb_upload.py`（Selenium + undetected-chromedriver），不改用 DrissionPage——今天才剛驗證過 Selenium/UC 這套在這台 Pi 上能穩定過 Cloudflare、session 能持久化，換函式庫要重驗證一次不划算，使用者也明確說「擷取需要的地方去用就好」。
+
+移植進 `rb_upload.py` 的東西：
+- 上一輪卡住的 Tags 欄位解法：`#main-tag-{lang}`（單一主標籤）與 `#supporting-tags-{lang}`（逗號分隔的其餘標籤）是兩個各自獨立的欄位，不是原本猜測的 `#work_tag_editor_{lang}` 隱藏欄位。兩者在 duplicate 頁面上也確認存在。
+- 語言分頁改用 XPath 點擊（`//*[@id="add-new-work"]/div/div[2]/div/div/label[N]/h3`，N=2/3/4 對應 de/fr/es，en 不用點是預設分頁），取代原本沒驗證過的 `label[for='language-tab-{lang}']` CSS 選擇器猜測。
+- 這頁的 React 欄位 plain `.clear()` 常清不乾淨：改用「JS 清空 value + Ctrl+A+Backspace + 硬送 30 次 Backspace」保底再輸入（`clear_and_input()`），Title/Main tag/Supporting tags/Description 都套用同一招。
+
+還沒補的：換圖（`select-image-large_clothing`）跟實際跑一次全流程驗證。
