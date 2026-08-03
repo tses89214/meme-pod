@@ -19,3 +19,4 @@
 - 系統只有 `chromium`（arm64），沒有 Google Chrome；`undetected_chromedriver` 預設會抓 x86_64 版 chromedriver 導致 arm64 上直接 Exec format error。已裝 `chromium-driver` apt 套件（版本要跟 `chromium` 對齊，兩個一起裝/升級）。
 - `undetected_chromedriver` 需要對 chromedriver 執行檔做 in-place patch（去掉自動化特徵），所以不能直接指向系統唯讀的 `/usr/bin/chromedriver`（PermissionError），要複製一份到使用者可寫路徑（例如 `~/.local/share/undetected_chromedriver/chromedriver_arm64`）再指定 `driver_executable_path`。
 - Redbubble 的 Cloudflare 驗證在 `/portfolio/images/new`、`/portfolio/images/<id>/duplicate` 這類頁面會自動過關，不需要人手動點任何框，純粹是等（實測 30-90 秒內都過了），登入 session 透過 `rb_upload.py` 的 `--user-data-dir`（`.rb_chrome_profile`）持久化，重開全新瀏覽器也記得登入。
+- 同一個 `.rb_chrome_profile` 也拿來登入 Pinterest（2026-08-03 手動登入過一次，跳到 `pinterest.com/business/hub/`），cookie 是分網域存的，Redbubble 和 Pinterest 共用同一份 profile 不會互相干擾。
