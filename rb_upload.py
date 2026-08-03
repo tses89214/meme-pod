@@ -82,7 +82,12 @@ def get_driver():
     options = uc.ChromeOptions()
     options.add_argument(f"--user-data-dir={PROFILE_DIR}")
     options.add_argument("--window-size=1280,900")
-    driver = uc.Chrome(options=options, headless=False, browser_executable_path="/usr/bin/chromium")
+    driver = uc.Chrome(
+        options=options,
+        headless=False,
+        browser_executable_path="/usr/bin/chromium",
+        driver_executable_path=str(Path.home() / ".local/share/undetected_chromedriver/chromedriver_arm64"),
+    )
     return driver
 
 
@@ -161,12 +166,11 @@ def fill_design(driver, meta: dict, image_path: str, submit: bool = False):
     driver.get(UPLOAD_URL)
     print(f"URL: {driver.current_url}")
 
-    # 等表單載入
+    # 等表單載入（Cloudflare 驗證可能要等 1-2 分鐘，會自動過，不用手動介入）
     try:
-        wait_for(driver, "#work_title_en", timeout=20)
+        wait_for(driver, "#work_title_en", timeout=150)
     except Exception:
-        print("  ❌ 表單沒載入（可能被 Cloudflare 擋住），請先手動通過驗證")
-        input("通過後按 Enter 繼續...")
+        raise RuntimeError("表單沒載入（Cloudflare 驗證超過 150 秒仍未過），請確認 profile 是否過期")
 
     # 1. 上傳圖片
     upload_image(driver, image_path)
