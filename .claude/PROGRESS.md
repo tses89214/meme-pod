@@ -1,15 +1,18 @@
 # PROGRESS
 
 ## 目前狀態（2026-08-03）
-新開 Pinterest 導流計畫，Phase 1（手動測水溫）規格已定案，寫成 `skills/meme-pinterest.md`。
-「My faith is beer」16 款字型待選/待上架事項：使用者已於本機自行處理完成，無需 Claude 動作。
+Redbubble 自動上傳除錯告一段落，暫停等使用者帶自己寫好的爬蟲腳本回來 import。
+Pinterest 導流計畫 Phase 1（手動測水溫）規格已定案，寫成 `skills/meme-pinterest.md`，10 支素材已備好文案交給使用者，網址/mockup 圖使用者手動處理中。
 
 ## 已完成
 - 掃過專案結構，確認 `.upload_queue.json` 為空（無待傳項目）。
 - 建立進度／決策／記憶文件，並修正 .gitignore 讓三份文件可被 commit。
 - CLAUDE.md 補上「TG 來的問題一律回 TG」規則。
-- 用 grilling 拷問完 Pinterest 導流計畫，定案：Business 帳號+shop 網址已聲明、單一 board、UTM 連結、Redbubble mockup 圖、手動貼、暫不用自動化 bot。寫成 `skills/meme-pinterest.md`（含 10 支種子清單），決策記入 DECISIONS.md。
+- 用 grilling 拷問完 Pinterest 導流計畫，定案並寫成 `skills/meme-pinterest.md`，10 支種子清單的文案已交付使用者。
+- 修好 Redbubble 自動化環境：apt 裝 `chromium`+`chromium-driver`（arm64 版本對齊，原本系統只有 chromium 沒有 chrome）、把系統 chromedriver 複製到使用者可寫路徑讓 undetected_chromedriver 能 patch、`rb_upload.py` 的 `get_driver()` 指定正確的 browser/driver 路徑。
+- 實測確認：Redbubble 登入 session 靠 `.rb_chrome_profile` 持久化，重開全新瀏覽器實例不用重新登入；`/portfolio/images/new`、`/portfolio/images/<id>/duplicate` 這類頁面的 Cloudflare 驗證會自動過關（30-90 秒等待，不用人手動點），已把 `rb_upload.py` 的等待 timeout 從 20 秒拉到 150 秒、拿掉會卡死的 `input()`。
+- 探索「Duplicate design」流程（決策見 DECISIONS.md）：找到黑/白範本 work id、duplicate 網址規則、title/description/checkbox/submit 的欄位 id（跟原 New Work 表單共用）。Tags 欄位是 React pill 元件還沒摸清楚怎麼操作。
 
 ## 下一步
-- 依 `skills/meme-pinterest.md` 幫使用者備好第一批 10 支 pin 的素材（網址/mockup 圖/UTM 連結/文案），使用者手動貼上 Pinterest。
-- 3-4 週後回顧有沒有流量訊號，決定要不要繼續、要不要拆 board、要不要評估自動化。
+- 使用者要帶自己寫好的爬蟲腳本回來，import 進 `rb_upload.py`，取代目前手動摸索的 duplicate 流程填表邏輯。
+- Pinterest：等使用者自己抓好 10 支的商品網址+mockup 圖，串上 UTM 後手動貼上 Pinterest；3-4 週後回顧流量訊號。
