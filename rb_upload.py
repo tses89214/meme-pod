@@ -82,7 +82,7 @@ def get_driver():
     options = uc.ChromeOptions()
     options.add_argument(f"--user-data-dir={PROFILE_DIR}")
     options.add_argument("--window-size=1280,900")
-    driver = uc.Chrome(options=options, headless=False)
+    driver = uc.Chrome(options=options, headless=False, browser_executable_path="/usr/bin/chromium")
     return driver
 
 
