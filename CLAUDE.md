@@ -2,6 +2,9 @@
 
 梗圖 T 恤全自動流水線：抓熱門梗 → 生成設計 → 上架 Redbubble → Telegram 通知。
 
+## Bot 服務規則
+這隻 bot 有 serving Telegram：從 TG 來的訊息，回應一律用 `reply` 工具回到 TG，不能只留在 transcript 裡。
+
 ## 每次會話流程
 
 ### 上班打卡（會話開始時）
