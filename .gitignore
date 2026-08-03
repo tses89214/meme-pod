@@ -3,6 +3,7 @@
 .upload_queue.json
 .last_meme_session.json
 rb_session.json
+.rb_chrome_profile/
 output/
 __pycache__/
 *.pyc
