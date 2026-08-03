@@ -45,3 +45,13 @@
 - 真正的耗時主因：用 `#select-image-base` 真的觸發換圖後，Redbubble 要重算幾十種商品類型的 mockup，頁面忙碌導致後續每個操作都變慢，全流程跑了約 1173 秒（近 20 分鐘）。換錯圖（不觸發真實處理）的那次只要幾十秒。這個延遲研判是 Redbubble 後端/前端處理圖片的固有成本，換人手動操作大概也要等類似時間，不是腳本效率問題，之後排程批次上架要把這個時間成本算進去。
 
 還沒做：實際按下 submit-work 送出測試（目前都停在 submit=False 的確認畫面）。
+
+## 2026-08-04 — Redbubble 實際上架成功：兩個設計、各黑白兩版，共 4 筆
+使用者指示「上這兩個，記得每個設計都要上黑白兩個版本」。實際跑了 `fill_design(..., submit=True)`：
+- My Faith Is Beer Funny Drinking Tee：白字圖→黑範本、黑字圖→白範本，各一筆
+- Universe Grant Me Power Cosmic Anime Tee：同上各一筆
+4 筆全部拿到 Redbubble「Congratulations! Your design is published.」確認頁，mockup 截圖檢查圖片在 T恤/帽踢上的大小比例正常（範本複製的縮放設定有生效）。
+
+黑底/白底範本配對邏輯（本回合確認）：黑底範本 (179795066) 配「白字」透明圖，白底範本 (179795087) 配「黑字」透明圖——卡片背景色跟文字顏色要對比，跟 `output/` 檔名的 black/white（代表文字顏色，不是底色）是反過來對應的，之後配對時要注意別搞反。
+
+`upload_metadata.json` 這兩筆已標 `uploaded: true`，但檔案本身還有使用者自己先前的未 commit 修改混在一起，沒有一併 commit，留給使用者自己處理。

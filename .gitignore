@@ -8,6 +8,7 @@ output/
 __pycache__/
 *.pyc
 _tmp_meta.json
+_rb_preview.png
 .claude/*
 !.claude/PROGRESS.md
 !.claude/DECISIONS.md

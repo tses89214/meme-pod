@@ -108,7 +108,9 @@ LANGUAGE_TAB_XPATH = {
 
 
 def clear_and_input(driver, el, text):
-    """React 控制的欄位，plain .clear() 常常清不乾淨，用 JS 清空 + 全選刪除 + 硬送 30 次 Backspace 保底。"""
+    """React 控制的欄位，plain .clear() 常常清不乾淨，用 JS 清空 + 全選刪除 + 硬送 30 次 Backspace 保底
+    (清空這段用真的按鍵事件才可靠，不能省)。清完後用原生 setter + dispatch input/change 事件直接灌值，
+    比一個字一個字 send_keys 快很多，且一樣會被 React 偵測到。"""
     from selenium.webdriver.common.keys import Keys
     el.click()
     driver.execute_script("arguments[0].value = ''", el)
@@ -116,7 +118,13 @@ def clear_and_input(driver, el, text):
     el.send_keys(Keys.BACKSPACE)
     for _ in range(30):
         el.send_keys(Keys.BACKSPACE)
-    el.send_keys(text)
+    driver.execute_script("""
+        const el = arguments[0], value = arguments[1];
+        const proto = el.tagName === 'TEXTAREA' ? window.HTMLTextAreaElement.prototype : window.HTMLInputElement.prototype;
+        Object.getOwnPropertyDescriptor(proto, 'value').set.call(el, value);
+        el.dispatchEvent(new Event('input', {bubbles: true}));
+        el.dispatchEvent(new Event('change', {bubbles: true}));
+    """, el, text)
 
 
 def click_language_tab(driver, lang: str):
@@ -131,10 +139,12 @@ def click_language_tab(driver, lang: str):
         print(f"  ⚠️  Language tab {lang}: {e}")
 
 
-def upload_image(driver, file_path: str):
-    """上傳主圖片（不彈出 file dialog，直接 send_keys）。"""
+def upload_image(driver, file_path: str, selector: str = "#select-image-single"):
+    """上傳主圖片（不彈出 file dialog，直接 send_keys）。
+    New Work 頁面用 #select-image-single；duplicate 頁面的「Replace all images」
+    對應 #select-image-base（使用者實測 DOM 檢查器確認）。"""
     from selenium.webdriver.common.by import By
-    inp = driver.find_element(By.CSS_SELECTOR, "#select-image-single")
+    inp = driver.find_element(By.CSS_SELECTOR, selector)
     driver.execute_script("arguments[0].style.display = 'block';", inp)
     inp.send_keys(file_path)
     print(f"  ⬆️  上傳圖片: {Path(file_path).name}")
@@ -154,12 +164,13 @@ def enable_all_products(driver):
         print("  ℹ️  Enable All 按鈕找不到（可能已全啟用）")
 
 
-def fill_design(driver, meta: dict, image_path: str, submit: bool = False):
-    """主填表流程。"""
+def fill_design(driver, meta: dict, image_path: str, submit: bool = False, target_url: str = None):
+    """主填表流程。target_url 預設是空白 New Work，但依規定新品要從既有設計 duplicate 出來，
+    呼叫時應該傳 black/white 範本的 /duplicate 網址。"""
     from selenium.webdriver.common.by import By
     from selenium.webdriver.common.keys import Keys
 
-    driver.get(UPLOAD_URL)
+    driver.get(target_url or UPLOAD_URL)
     print(f"URL: {driver.current_url}")
 
     # 等表單載入（Cloudflare 驗證可能要等 1-2 分鐘，會自動過，不用手動介入）
@@ -168,8 +179,9 @@ def fill_design(driver, meta: dict, image_path: str, submit: bool = False):
     except Exception:
         raise RuntimeError("表單沒載入（Cloudflare 驗證超過 150 秒仍未過），請確認 profile 是否過期")
 
-    # 1. 上傳圖片
-    upload_image(driver, image_path)
+    # 1. 上傳圖片（duplicate 頁用 base 的換圖 input，New Work 頁用 single）
+    image_selector = "#select-image-base" if target_url else "#select-image-single"
+    upload_image(driver, image_path, selector=image_selector)
 
     # 2. 填寫各語言
     translations = meta.get("translations", {})
