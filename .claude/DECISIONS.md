@@ -98,3 +98,15 @@ Beer 那筆是手動測試時發的，事後補標 `pinned: true`（沒有真的
 使用者要求上架時能選要放哪個 collection，明確說「新增不要做，幫我選擇就好」。
 技術細節：collection 勾選框 id 是 `work_group_ids_<id>`，對應的名稱不是標準 `label[for]`，是 parent `<label title="名稱">`，勾選框的 `name` 屬性是 `work[collection_ids][<id>]`。目前這個範本（duplicate 來源）底下有 5 個 collection：漢字/Bilingual、Adult Class System、Life.exe Has Stopped Working、Train Hard. Repeat.、Dark Tech humor（範本預設勾這個）。
 實作：`rb_upload.py` 加 `list_collections()`/`select_collection()`，選了哪個就只勾那個（取消其他），沒給就保留範本原本勾的。新增 CLI `python rb_upload.py collections` 方便先查現有選項。`publish_design.py` 第三個參數就是 collection 名稱，`/meme` flow 選字型時一併問使用者。找不到對應名稱時直接跳過並印警告，不會自己新增。
+
+## 2026-08-04 — 舊設計補發 Pinterest：manage_works 分頁比對出商品網址
+使用者要求把「今天自動化之前」就上架的舊設計也補發 Pinterest。這些設計沒有存商品網址（今天的自動抓網址功能是後來才加的），解法：
+- `redbubble.com/portfolio/manage_works` 後台管理頁每個作品卡片有「Edit」連結，格式 `/portfolio/images/<work_id>-<title-slug>/edit`，這個 slug 就是商品公開網址 `redbubble.com/shop/ap/<work_id>` 的來源，不用一個一個開 promote 頁。
+- 這頁是真分頁（`?page=2`，不是無限捲動），第一輪只抓到第 1 頁（24 個作品/48 個連結）漏了第 2 頁，要照 `rel="next"` 連結把每一頁都load 完才抓得全（2 頁共 42 個作品/84 個連結）。
+- 用「metadata 標題 slugify 後比對 work slug」配對，slugify 規則要注意：句點 `.` 要轉成 `-` 不是直接刪掉（例如 "Lv.1" 對應 "lv-1"），刪掉會比對失敗。
+- 4 筆比對不到：Staff Adult Lv.99 Funny Gaming Meme、Orange Juice Sweat Zhongshan Qiang Abstract Chinese Tee、Cat Time Funny Cute Meme Tee、I Believe in Air Conditioner Funny Summer Meme Tee——可能當初沒有真的上架成功（`uploaded:true` 標記可能不準），使用者說先不管，之後要人工去後台核對。
+- 另外 3 筆是標題有出入的模糊比對（人工核對過詞序/用字差異後手動配對，不是自動化邏輯）：Mushroom Funny Food Bilingual Tee、Mist Bilingual Chinese Nature Tee、Chimi Moryo Chinese Demons Mythology Tee——Redbubble 上的實際標題跟 metadata 存的有些微差異（詞序或單複數）。
+
+抓 mockup 圖也順手改了：原本永遠抓第一張（`candidates[0]`），使用者要求隨機化避免每次都同一件商品照，改成去重後 `random.choice()`。
+
+結果：42 筆裡 42 筆都補上網址並發了 Pinterest（一次批次 20 筆 + 一次 18 筆，其中 1 筆判斷失敗但實際有成功，重跑後確認），4 筆無網址擱置。這也算是第一次批次量測試（38 筆一次跑完），沒出穩定性問題。
