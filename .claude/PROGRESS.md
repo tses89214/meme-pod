@@ -21,7 +21,8 @@ Redbubble + Pinterest 全自動管線都打通並跑過真實資料，端到端�
 - `.gitignore` 補上 `.rb_chrome_profile/`（內含登入 session/cookie，不可進版控）。
 
 ## 下一步（下次會話上班打卡先看這）
-- 兩條管線都能用了，但都只驗證過個位數的量（3 個設計），沒測過大量批次（10+ 件連續跑）的穩定性，Cloudflare/處理時間累積、Pinterest 有沒有發文頻率限制都還不知道。
-- Redbubble 上架完 + Pinterest 發完 pin 是兩個分開的手動步驟（先跑 `rb_upload.py` 上架，再跑 `pinterest_upload.py batch` 發 pin），沒有串成一個指令一次做完，之後量大可以考慮接起來。
+- 流程已經串成一個指令 `publish_design.py "<text>" <font> [collection]`：Redbubble 黑白兩版上架 + Pinterest 發 pin 一次做完。`/meme` skill 也更新成這套（選字型、選 collection 都問使用者，其餘全自動，包含 Drive 備份）。
+- Collection 功能只做「選現有的」，沒做新增；`python rb_upload.py collections` 可查目前選項。
+- 兩條管線只驗證過個位數的量（3 個設計），沒測過大量批次（10+ 件連續跑）的穩定性，Cloudflare/處理時間累積、Pinterest 有沒有發文頻率限制都還不知道。
 - `skills/meme-pinterest.md` 的 Open TODOs 裡「拆 board」那項還沒做，board 分類還是只有一個「Funny Meme Shirts」。
 - `upload_metadata.json` 有未 commit 的修改（使用者原本的 + 這次新增的 uploaded/redbubble_url/pinned 欄位），下次動這個檔案前先跟使用者確認要不要一起 commit。
