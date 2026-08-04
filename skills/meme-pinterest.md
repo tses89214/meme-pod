@@ -2,7 +2,7 @@
 
 Auto-post pins to Pinterest for already-uploaded Redbubble designs, using the same Selenium/undetected-chromedriver stack as `rb_upload.py` (shared login profile — see `.claude/MEMORY.md`).
 
-Status: v2, being built 2026-08-04. Automation replaces the original manual-pilot plan per user's explicit call (DECISIONS.md 2026-08-04 "此決定被使用者明確推翻"). Pin-builder UI has been explored (selectors below); board creation + full post flow + batch loop not yet written.
+Status: v2. First real pin published successfully 2026-08-04 (manual single-pin test, not yet wired into a batch loop). Automation replaces the original manual-pilot plan per user's explicit call (DECISIONS.md 2026-08-04 "此決定被使用者明確推翻").
 
 ## Syntax
 
@@ -24,47 +24,27 @@ URL: `https://www.pinterest.com/pin-builder/` — went straight to the create-pi
 
 Per-pin dynamic UUID suffix on several element ids (e.g. `pin-draft-title-<uuid>`) — don't hardcode the full id, match by placeholder/aria-label/id-prefix instead:
 
-- Image upload: `input[type="file"][aria-label="上傳檔案"]` (likely works with `.send_keys(path)` same as Redbubble's pattern — not yet tested). Alternate: "儲存自網站" button lets Pinterest pull the image straight from a URL (Save-button style, matches the reference article's workflow) — not yet tested which is more reliable for us.
-- Title: `textarea[placeholder="新增標題"]`
-- Description: NOT a plain input — it's a Draft.js contenteditable div, `div[aria-label="讓所有人知道你的 Pin 內容"]`. Click + send_keys should work but untested; React/Draft.js editors sometimes need the same native-setter+event-dispatch trick used for Redbubble's fields if plain send_keys misbehaves.
-- Destination link: `textarea[placeholder="新增目的地連結"]` — separate field from description, so the "no bare https://" gotcha (see Learned tactics below) only applies to the description text, not this field.
-- Board picker: click `[data-test-id="board-dropdown-select-button"]` to open a flyout with a search box (`[data-test-id="search-boards-field-container"]`) and, if searching an existing board name, presumably `[role="option"]` results (untested — account has no boards yet to verify against). To create a new board: `[data-test-id="create-board-button"]` (opens a further flow, not yet explored — likely name/description/category/privacy fields, not yet mapped).
-- Publish button: `[data-test-id="board-dropdown-save-button"]` (top-right red button, labelled 發布).
-- Publish now vs scheduled: radio inputs `id^="pin-draft-schedule-publish-immediately-"` / `-later-`; "immediately" is selected by default.
-- AI-disclosure toggle/checkboxes: leave off, our art isn't AI-generated-person content.
+- Image upload: `input[type="file"][aria-label="上傳檔案"]` + `.send_keys(local_path)`, same pattern as Redbubble. **Confirmed working 2026-08-04.** Don't use "儲存自網站" (save-from-website) for Redbubble product pages — tested, it scrapes random page icons (avatar, heart icon) instead of the product mockup, useless for us.
+- Title: `textarea[placeholder="新增標題"]` + plain `.send_keys()`. Confirmed working.
+- Description: Draft.js contenteditable div, `div[aria-label="讓所有人知道你的 Pin 內容"]`. Plain click + `.send_keys()` worked fine, no React-hack needed (unlike Redbubble's tag fields).
+- Destination link: `textarea[placeholder="新增目的地連結"]`, plain `.send_keys()`. Confirmed working with a full `https://...?utm_...` URL — the "no bare https://" gotcha (see Learned tactics) only applies to the description text, this field is fine.
+- Board picker: click `[data-test-id="board-dropdown-select-button"]`, then click `[data-test-id="board-row-<exact board name>"]` directly — no need to type into the search box first, the row selector works even without narrowing the list. To create a new board: click `[data-test-id="create-board-button"]`, fill `#boardEditName`, leave `#secret` checkbox unchecked (public), click `[data-test-id="board-form-submit-button"]`. **Confirmed working 2026-08-04** — created "Funny Meme Shirts" this way, no CAPTCHA despite a recaptcha field existing in the DOM.
+- Publish button: `[data-test-id="board-dropdown-save-button"]` (top-right red button, labelled 發布). Confirmed working — success shows a "你已建立一個 Pin！" modal and a "已儲存到 <board>" toast.
+- Publish now vs scheduled: radio inputs `id^="pin-draft-schedule-publish-immediately-"` / `-later-`; "immediately" is selected by default, left untouched.
+- AI-disclosure toggle/checkboxes: left off, untouched.
+- Minor: Pinterest shows a non-blocking warning if the image aspect ratio isn't at least 2:3 (portrait) — our square 5000×5000 designs trigger it but publish anyway. Worth cropping/padding to portrait for better performance later, not a blocker now.
 
-Not yet done: create-board flow, actually filling+submitting one real pin end to end, verifying the image upload approach, wiring up a batch loop over designs.
+## What to do (current — manual single-pin, confirmed working end to end)
 
-## What to do
+1. Pick a design from `upload_metadata.json` where `"uploaded": true`.
+2. Get its live Redbubble product URL: the cleanest known way right now is from the upload's own promote-page confirmation (`https://www.redbubble.com/studio/promote/<work_id>`) — find the `<a>` with text "View", its `href` is the public product URL (e.g. `https://www.redbubble.com/shop/ap/<id>`). Only works if you have that promote URL from the upload step; there's no stored mapping from title → URL yet (see Open TODOs).
+3. Build the pin link: `<product_url>?utm_source=pinterest&utm_medium=social&utm_campaign=auto` (drop any `?ref=...` Redbubble appended).
+4. Image: use a local transparent design PNG from `output/` for now (confirmed working). Real product mockup photos would look better per the reference article, but there's no reliable automated way to fetch them yet (og:image fetch untested, save-from-website doesn't work) — open TODO.
+5. Title/description: adapt from `upload_metadata.json`'s `title`/`description` — keep description free of any bare `https://` text.
+6. Board: `Funny Meme Shirts` (already created).
+7. Fill all fields, then Publish.
 
-1. Pick N designs from `upload_metadata.json` where `"uploaded": true`, favoring broad/universal punchlines (work humor, gym, gaming-life-level jokes) over niche bilingual/Chinese-culture ones — those may deserve their own board later but dilute a small pilot batch.
-2. For each pick, get the live product URL:
-   - Ask the user to paste the shop page URL (fastest), or
-   - Fetch `https://www.redbubble.com/people/tses89214/shop` and match by title if it renders without JS (may not work — SPA).
-3. Build the pin link: `<product_url>?utm_source=pinterest&utm_medium=social&utm_campaign=pilot`
-4. Get the mockup image: fetch the product page, extract `og:image` (Redbubble's auto-generated mockup photo). Do NOT use the bare transparent design PNG from `output/` — mockups convert better on a visual platform.
-5. Draft Pinterest copy per pin (reuse `upload_metadata.json`'s `title`/`description`/`tags` as the seed, adapt to Pinterest's format/length):
-   - Title: ≤100 chars, keyword-first
-   - Description: ≤500 chars, natural sentence with 2-3 keywords worked in
-6. Hand the user a checklist (image + title + description + link per pin) — they paste it into Pinterest manually.
-7. Tell the user to spread posting over 3-5 days, not all at once, and to wait 3-4 weeks before judging signal (Pinterest is slow-burn discovery, not like IG/TikTok).
-
-## Why manual (don't skip to automation)
-
-Decided 2026-08-03: the strategy itself is unvalidated — no Pinterest presence existed before this. Building/wiring a bulk-post tool before knowing whether Pinterest drives any Redbubble traffic is wasted setup. Revisit automation only once weekly pin volume would need to exceed ~30/week AND the pilot has shown a measurable traffic/CTR signal via the UTM tags. Until then, every pin here is posted by hand.
-
-## First pilot batch (2026-08-03, for reference — not meant to be reused verbatim next time)
-
-1. Ask AI Before You Ask Me Anything
-2. Human Pro Max Funny Upgrade Meme
-3. Fine You're Right You're Always Right
-4. Life Is a Bitch So Learn How to F It
-5. I'm Not Lazy, I'm On Energy Saving Mode
-6. I'm Allergic to Work
-7. Professional Overthinker
-8. Work Hard. Stay Humble. Quit Early.
-9. OOO Out Of Time Energy Money
-10. KPI Killing People Inside
+Not yet built: batch loop over multiple designs, product-URL-lookup that doesn't depend on having a promote-page link handy, real mockup image sourcing, de-dup tracking (which designs have already been pinned) analogous to `upload_metadata.json`'s `uploaded` flag.
 
 ## Learned tactics (from external article, 2026-08-04)
 
@@ -78,6 +58,8 @@ Source: https://straightforward.se/blog/creating-a-shopfront-for-your-redbubble-
 
 ## Open TODOs (optimize later, per user — don't do these unasked)
 
-- Capture live product URL in `upload_metadata.json` at upload time (edit `uploader.py`) so future batches don't need manual URL hunting.
-- Once signal is validated: revisit whether a bulk tool (own Playwright script reusing `rb_interactive.py`'s manual-login pattern, vs. a third-party Selenium bot) is worth it.
+- Capture live product URL in `upload_metadata.json` at upload time (edit `rb_upload.py`'s `fill_design` to grab the "View" link href right after submit) so future pins don't need manual URL hunting via the promote page.
+- Add a `pinned` (or similar) flag per design in `upload_metadata.json`, mirroring `uploaded`, so a batch script can skip designs already pinned.
+- Figure out real mockup image sourcing (og:image fetch from the product page, now that we know save-from-website doesn't work) instead of using the bare transparent design PNG.
+- Write the actual batch loop (mirrors `rb_batch_upload.py`'s pattern) once the above are in place.
 - Consider splitting "Funny Meme Shirts" into theme boards once Pinterest Analytics shows which theme performs.
