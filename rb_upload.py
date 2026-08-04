@@ -31,6 +31,9 @@ QUEUE_FILE = BASE_DIR / ".upload_queue.json"
 PROFILE_DIR = BASE_DIR / ".rb_chrome_profile"
 
 UPLOAD_URL = "https://www.redbubble.com/portfolio/images/new"
+# 複製範本：黑底範本配白字圖，白底範本配黑字圖（見 DECISIONS.md 2026-08-04 配對邏輯）
+BLACK_TEMPLATE_DUP_URL = "https://www.redbubble.com/portfolio/images/179795066-tbd-totally-been-delayed-funny-work-meme-tee/duplicate"
+WHITE_TEMPLATE_DUP_URL = "https://www.redbubble.com/portfolio/images/179795087-tbd-totally-been-delayed-funny-work-meme-tee/duplicate"
 
 
 def load_queue():
