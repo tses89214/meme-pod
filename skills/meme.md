@@ -49,11 +49,16 @@ Generate a meme T-shirt design preview from text, send a 2×3 font preview grid 
 3. When user replies with a number (font choice is always the user's call, never pick for them):
    - Save to `.upload_queue.json` with font name and font_idx (still needed — `drive_upload.py batch` in step 5 depends on this queue, it's not dead).
    - Write the metadata entry into `upload_metadata.json` yourself — title/description/tags/main_tag + translations in EN/DE/FR/ES. This is a judgment call (copywriting), not scriptable — see `## Metadata entry format` below.
+   - Ask which Redbubble collection to file it under (also always the user's call — never pick for them, and never invent a new collection name). Check current options first (they can change over time, don't rely on a stale hardcoded list):
+     ```bash
+     cd ~/meme-pod && python rb_upload.py collections
+     ```
+     Present the list, let them pick one or say "skip" (skipping leaves whatever the duplicated template already had checked — see DECISIONS.md 2026-08-04). If they name a collection that isn't in the list, tell them it doesn't exist — this flow only selects existing collections, it doesn't create new ones.
 4. Run the full shop-publish pipeline in the background (this takes a while — two Redbubble submits ~20min each plus a Pinterest post, see `skills/meme-pinterest.md` and DECISIONS.md 2026-08-04 for why):
    ```bash
-   cd ~/meme-pod && python publish_design.py "<text>" <font name, e.g. dancing>
+   cd ~/meme-pod && python publish_design.py "<text>" <font name, e.g. dancing> ["<collection name>"]
    ```
-   Does: Redbubble upload (black+white variants, duplicated from the correct template — see `rb_upload.py`'s `BLACK_TEMPLATE_DUP_URL`/`WHITE_TEMPLATE_DUP_URL`), captures the product URL, then auto-posts a Pinterest pin with a real product mockup image. No further confirmation needed mid-flow.
+   Omit the third arg if the user skipped collection choice. Does: Redbubble upload (black+white variants, duplicated from the correct template — see `rb_upload.py`'s `BLACK_TEMPLATE_DUP_URL`/`WHITE_TEMPLATE_DUP_URL`), captures the product URL, then auto-posts a Pinterest pin with a real product mockup image. No further confirmation needed mid-flow.
 5. Also run the Google Drive backup (still part of the default flow — user confirmed 2026-08-04 this isn't optional, just not blocking):
    ```bash
    cd ~/meme-pod && python drive_upload.py batch
