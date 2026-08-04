@@ -254,6 +254,7 @@ def fill_design(driver, meta: dict, image_path: str, submit: bool = False, targe
     print(f"  📸 截圖: {screenshot}")
 
     # 5. 送出
+    product_url = None
     if submit:
         try:
             btn = driver.find_element(By.CSS_SELECTOR, "#submit-work")
@@ -262,10 +263,21 @@ def fill_design(driver, meta: dict, image_path: str, submit: bool = False, targe
             time.sleep(5)
             print(f"  URL: {driver.current_url}")
             driver.save_screenshot(str(screenshot))
+            # 送出後會落在 /studio/promote/<id> 確認頁，"View" 連結的 href 是公開商品網址
+            try:
+                view_links = driver.execute_script("""
+                    return Array.from(document.querySelectorAll('a')).filter(a => a.innerText.trim() === 'View').map(a => a.href);
+                """)
+                if view_links:
+                    product_url = view_links[0].split("?")[0]
+                    print(f"  🔗 商品網址: {product_url}")
+            except Exception as e:
+                print(f"  ⚠️  抓不到商品網址: {e}")
         except Exception as e:
             print(f"  ❌ 送出失敗: {e}")
     else:
         print("\n  ℹ️  未自動送出。確認內容後，加 --submit 重跑，或手動點按鈕。")
+    return product_url
 
 
 def cmd_list():
