@@ -91,3 +91,10 @@ Beer 那筆是手動測試時發的，事後補標 `pinned: true`（沒有真的
 使用者要求把整條流程接起來，但選字型這步依然要留給使用者自己決定（明確講「選字型一樣交給我」）。
 分界線定在：字型選擇 + metadata 文案撰寫（標題/描述/tags/翻譯）是需要判斷的工作，留給人／Claude；選完字型、metadata 寫好之後，剩下全部自動：Redbubble 黑白兩版上架 → 抓商品網址 → Pinterest 發 pin，一個指令 `python publish_design.py "<text>" <font>` 跑完。
 `/meme` skill 的 step 3 已改成呼叫這支，取代舊的 Google Drive 備份路徑（Drive 變成非預設、使用者要才跑）。
+
+**2026-08-04 補充：Google Drive 備份使用者說還是要做**，不是非預設——上面那句寫錯了。已改回 `/meme` flow 的固定步驟（跑在 Redbubble/Pinterest 之後，不卡住它們），見 skill 文件最新版。
+
+## 2026-08-04 — Redbubble Collection 選擇：只能選現有的，不做新增
+使用者要求上架時能選要放哪個 collection，明確說「新增不要做，幫我選擇就好」。
+技術細節：collection 勾選框 id 是 `work_group_ids_<id>`，對應的名稱不是標準 `label[for]`，是 parent `<label title="名稱">`，勾選框的 `name` 屬性是 `work[collection_ids][<id>]`。目前這個範本（duplicate 來源）底下有 5 個 collection：漢字/Bilingual、Adult Class System、Life.exe Has Stopped Working、Train Hard. Repeat.、Dark Tech humor（範本預設勾這個）。
+實作：`rb_upload.py` 加 `list_collections()`/`select_collection()`，選了哪個就只勾那個（取消其他），沒給就保留範本原本勾的。新增 CLI `python rb_upload.py collections` 方便先查現有選項。`publish_design.py` 第三個參數就是 collection 名稱，`/meme` flow 選字型時一併問使用者。找不到對應名稱時直接跳過並印警告，不會自己新增。
