@@ -1,9 +1,13 @@
 # PROGRESS
 
 ## 目前狀態（2026-08-04）
-Redbubble 自動上架管線可用且已實戰驗證：3 個設計（My faith is beer、Universe Grant Me Power、Actions Speak Louder Than Words）、黑白共 6 筆，全部真的 submit 上架成功。換圖 selector `#select-image-base`，Selenium command timeout 拉到 600 秒解掉間歇性 timeout。細節見 DECISIONS.md。
+Redbubble + Pinterest 全自動管線都打通並跑過真實資料，端到端：生成設計 → Redbubble 上架（黑白兩版）→ 自動抓商品網址 → 抓真實 mockup 照 → 自動發 Pinterest pin → 標記完成。3 個設計（My faith is beer、Universe Grant Me Power、Actions Speak Louder Than Words）全部走完全程，`pinterest_upload.py list` 確認無待辦。
 
-Pinterest 決定跳過手動驗證階段，直接做自動發文（使用者明確指示推翻 8/3 的手動優先決定）。已建好「Funny Meme Shirts」board，並成功自動發布第一個真的 pin（My faith is beer，本地圖檔+標題+描述+目的地連結+board 全自動填寫送出，Pinterest 確認「你已建立一個 Pin！」）。技術細節、選擇器、踩過的雷（「儲存自網站」抓不到商品圖）都記在 `skills/meme-pinterest.md`。
+兩支主要腳本：
+- `rb_upload.py`：`get_driver()` + `fill_design(meta, image_path, submit=True, target_url=<黑/白範本 duplicate 網址>)`，送出後會 return 商品網址。
+- `pinterest_upload.py`：`list`/`batch`/`one <關鍵字>`，讀 `upload_metadata.json` 裡 `uploaded=true` 且有 `redbubble_url` 且 `pinned` 不是 true 的設計，自動抓 mockup 圖、發 pin、標記 `pinned=true`。
+
+技術細節、選擇器、踩過的雷都記在 DECISIONS.md 和 `skills/meme-pinterest.md`。
 
 ## 已完成
 - 掃過專案結構，確認 `.upload_queue.json` 為空（無待傳項目）。
@@ -17,10 +21,7 @@ Pinterest 決定跳過手動驗證階段，直接做自動發文（使用者明�
 - `.gitignore` 補上 `.rb_chrome_profile/`（內含登入 session/cookie，不可進版控）。
 
 ## 下一步（下次會話上班打卡先看這）
-- Redbubble 上傳管線已經可用（`rb_upload.py` 的 `get_driver()` + `fill_design(target_url=..., submit=True)`），新設計要上架照黑範本配白字圖、白範本配黑字圖的模式跑。只驗證過 3 個設計，大量批次（10+ 件）的穩定性沒測過。
-- Pinterest 自動發文機制可用但還是單支手動觸發，還沒做成批次迴圈。缺口：
-  1. 商品網址目前靠 promote 確認頁的「View」連結現抓，沒有存到 `upload_metadata.json`，之後每次都要重找
-  2. 圖片用的是本地透明設計圖，不是商品 mockup 照（Pinterest 建議 2:3 長寬比，我們是正方形）
-  3. 沒有「哪些設計已經 pin 過」的追蹤，重跑會不會重複發要注意
-  上述都列在 `skills/meme-pinterest.md` 的 Open TODOs，下次可以直接接著做批次版本。
-- `upload_metadata.json` 有未 commit 的修改（使用者原本的 + 這次新增的 2 筆 uploaded:true，Actions 那筆本來就已經是 true），下次動這個檔案前先跟使用者確認要不要一起 commit。
+- 兩條管線都能用了，但都只驗證過個位數的量（3 個設計），沒測過大量批次（10+ 件連續跑）的穩定性，Cloudflare/處理時間累積、Pinterest 有沒有發文頻率限制都還不知道。
+- Redbubble 上架完 + Pinterest 發完 pin 是兩個分開的手動步驟（先跑 `rb_upload.py` 上架，再跑 `pinterest_upload.py batch` 發 pin），沒有串成一個指令一次做完，之後量大可以考慮接起來。
+- `skills/meme-pinterest.md` 的 Open TODOs 裡「拆 board」那項還沒做，board 分類還是只有一個「Funny Meme Shirts」。
+- `upload_metadata.json` 有未 commit 的修改（使用者原本的 + 這次新增的 uploaded/redbubble_url/pinned 欄位），下次動這個檔案前先跟使用者確認要不要一起 commit。
