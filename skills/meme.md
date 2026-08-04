@@ -47,14 +47,19 @@ Generate a meme T-shirt design preview from text, send a 2×3 font preview grid 
    16. TRAIN ONE（手書き風）
 
 3. When user replies with a number (font choice is always the user's call, never pick for them):
+   - Save to `.upload_queue.json` with font name and font_idx (still needed — `drive_upload.py batch` in step 5 depends on this queue, it's not dead).
    - Write the metadata entry into `upload_metadata.json` yourself — title/description/tags/main_tag + translations in EN/DE/FR/ES. This is a judgment call (copywriting), not scriptable — see `## Metadata entry format` below.
-   - Run the full publish pipeline in the background (this takes a while — two Redbubble submits ~20min each plus a Pinterest post, see `skills/meme-pinterest.md` and DECISIONS.md 2026-08-04 for why):
-     ```bash
-     cd ~/meme-pod && python publish_design.py "<text>" <font name, e.g. dancing>
-     ```
-     This alone does: Redbubble upload (black+white variants, duplicated from the correct template — see `rb_upload.py`'s `BLACK_TEMPLATE_DUP_URL`/`WHITE_TEMPLATE_DUP_URL`), captures the product URL, then auto-posts a Pinterest pin with a real product mockup image. No further confirmation needed mid-flow — it's meant to run unattended once metadata is written.
-   - Confirm to user once it's done: report both Redbubble product URLs and Pinterest publish status (the script prints a `=== 完成 ===` summary block with exactly these).
-   - `drive_upload.py batch` (Google Drive backup) is a separate, optional path — not part of the default flow anymore, only run it if the user asks for a Drive backup specifically.
+4. Run the full shop-publish pipeline in the background (this takes a while — two Redbubble submits ~20min each plus a Pinterest post, see `skills/meme-pinterest.md` and DECISIONS.md 2026-08-04 for why):
+   ```bash
+   cd ~/meme-pod && python publish_design.py "<text>" <font name, e.g. dancing>
+   ```
+   Does: Redbubble upload (black+white variants, duplicated from the correct template — see `rb_upload.py`'s `BLACK_TEMPLATE_DUP_URL`/`WHITE_TEMPLATE_DUP_URL`), captures the product URL, then auto-posts a Pinterest pin with a real product mockup image. No further confirmation needed mid-flow.
+5. Also run the Google Drive backup (still part of the default flow — user confirmed 2026-08-04 this isn't optional, just not blocking):
+   ```bash
+   cd ~/meme-pod && python drive_upload.py batch
+   ```
+   This regenerates the design fresh from `.upload_queue.json` (its own subprocess call to `quick_meme.py`), uploads both variants + a meta.json to Drive, and deletes the local files + clears the queue when done. Order relative to step 4 doesn't matter functionally (it regenerates its own copies), but do it after so the shop/Pinterest steps aren't waiting on it.
+6. Confirm to user once both are done: report both Redbubble product URLs, Pinterest publish status, and the Drive folder link (the publish script prints a `=== 完成 ===` summary; `drive_upload.py batch` prints its own links per variant).
 
 ## Queue entry format
 
