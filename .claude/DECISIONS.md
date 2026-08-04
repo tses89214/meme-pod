@@ -76,3 +76,13 @@
 圖片目前用本地的透明設計圖（非商品 mockup 照），Pinterest 有跳出「建議長寬比至少 2:3」的非阻擋警告（我們的圖是正方形）。
 
 還沒做：批次迴圈（一次跑多個設計）、真的商品 mockup 圖來源、「哪些設計已經 pin 過」的追蹤欄位。
+
+## 2026-08-04 — Pinterest 批次管線補完：`pinterest_upload.py`
+補完上面留的三個缺口：
+1. `rb_upload.py` 的 `fill_design()` 送出後自動抓 View 連結存 `product_url`（return 值），不用再手動去 promote 頁挖。
+2. 真的商品 mockup 圖：意外發現 Redbubble 公開商品頁（`/shop/ap/<id>`）完全不擋 Cloudflare，純 `requests` 就能抓，連瀏覽器都不用開。圖片網址不是 `<img src>`，是藏在頁面內嵌的 client-hydration JSON 裡，斜線被跳脫成 `{{%2F}}`，要用 regex 撈 `square_close_portrait...x1000...jpg` 這個模式再還原跳脫字元。找不到就退回 `og:image`（純設計平面圖）當備案。
+3. `upload_metadata.json` 加 `redbubble_url` + `pinned` 兩個欄位，`pinned` 邏輯跟既有的 `uploaded` 一樣。
+
+新增 `pinterest_upload.py`（`list`/`batch`/`one <關鍵字>`），跟 `rb_upload.py` 共用同一個瀏覽器 profile/登入。實測：Universe Grant Me Power 用 `one` 指令跑，抓到真實 mockup 照（毛衣實拍）、自動判斷「已建立一個 Pin」成功訊息、自動存回 `pinned: true`，全程沒人手動介入。
+
+Beer 那筆是手動測試時發的，事後補標 `pinned: true`（沒有真的重跑一次自動流程去發第二次）。
