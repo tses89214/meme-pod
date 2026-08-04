@@ -58,8 +58,24 @@ Source: https://straightforward.se/blog/creating-a-shopfront-for-your-redbubble-
 
 ## Open TODOs (optimize later, per user — don't do these unasked)
 
-- Capture live product URL in `upload_metadata.json` at upload time (edit `rb_upload.py`'s `fill_design` to grab the "View" link href right after submit) so future pins don't need manual URL hunting via the promote page.
-- Add a `pinned` (or similar) flag per design in `upload_metadata.json`, mirroring `uploaded`, so a batch script can skip designs already pinned.
-- Figure out real mockup image sourcing (og:image fetch from the product page, now that we know save-from-website doesn't work) instead of using the bare transparent design PNG.
-- Write the actual batch loop (mirrors `rb_batch_upload.py`'s pattern) once the above are in place.
-- Consider splitting "Funny Meme Shirts" into theme boards once Pinterest Analytics shows which theme performs.
+- ~~Capture live product URL in `upload_metadata.json` at upload time~~ — done, `fill_design()` returns it.
+- ~~Add a `pinned` flag~~ — done, `upload_metadata.json` has it, `pinterest_upload.py` respects it.
+- ~~Real mockup image sourcing~~ — done, `pinterest_upload.py`'s `get_mockup_image()` pulls real product photos, randomized per pin.
+- ~~Batch loop~~ — done, `pinterest_upload.py batch` / `publish_design.py`.
+- Split "Funny Meme Shirts" into theme boards (e.g. "Funny Work Meme Tees", "Sarcastic Quote Shirts", "Bilingual Chinese Design Tees") — best-practice research (below) recommends 10-15 niche boards over one catch-all; not done yet, pending user decision.
+- Portrait (2:3) pin images — current mockups are square 1000×1000 despite being named `square_close_portrait`; Pinterest recommends true 2:3 for best performance. Not solved yet.
+- Pinterest profile bio is currently blank — best practice says fill it with keywords (shop niche, "print on demand", etc). Draft pending user review before applying.
+- **Posting cadence conflict, unresolved**: best-practice sources consistently say steady/gradual posting outperforms bulk-dumping, and the algorithm doesn't reward sudden volume spikes. Current `pinterest_upload.py batch` posts everything back-to-back in one run (did 38 pins in two batches on 2026-08-04). Whether to add throttling/scheduling instead of one-shot batch is an open decision, not yet made.
+
+## Pinterest best-practice research (2026-08-04, for user review before adopting)
+
+Searched several 2026 Pinterest SEO / POD-seller guides. Key points, condensed:
+
+- **Profile**: name close to shop name, keyword-rich bio (niche + "print on demand" + what you sell).
+- **Boards**: 10-15 specific boards beat one generic catch-all — board name is a strong ranking signal (e.g. "Funny Dog Mom T-Shirts", not "T-Shirts").
+- **Pin images**: vertical 2:3 (or 9:16 for video) outperforms square; bold text overlay, high contrast, clean layout.
+- **Pin copy**: keyword-rich title + description; the `[what]–[who]–[where]–[when]–[why]–[how]` formula (see Learned tactics above) still applies.
+- **Cadence**: consistent small-and-steady beats infrequent bulk bursts — Pinterest's algorithm favors regular activity, results take weeks/months either way, no need to rush volume.
+- **Content mix**: pure product/storefront pins work, but blending in idea/how-to/inspiration content builds a healthier funnel long-term (lower priority for a meme-tee shop, noted for completeness).
+
+Sources: [Pinterest SEO Guide 2026 (Spocket)](https://www.spocket.co/blogs/pinterest-seo), [Pinterest SEO (SEO Sherpa)](https://seosherpa.com/pinterest-seo/), [Pinterest Marketing Guide 2026 (Hootsuite)](https://blog.hootsuite.com/pinterest-marketing/), [Pinterest for Small Business (Sprout Social)](https://sproutsocial.com/insights/pinterest-for-small-business-marketing/), [How to Use Pinterest for Etsy (Printful)](https://www.printful.com/blog/how-to-use-pinterest-for-etsy), [Pinterest Marketing for Print on Demand (Merch Titans)](https://merchtitans.com/blog/pinterest-marketing-print-on-demand), [How To Use Pinterest for RedBubble Marketing (Medium)](https://thatholisticmom.medium.com/how-to-use-pinterest-for-redbubble-marketing-8bd75d8ad301)
