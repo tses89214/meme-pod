@@ -9,6 +9,7 @@ __pycache__/
 *.pyc
 _tmp_meta.json
 _rb_preview.png
+_pinterest_tmp/
 .claude/*
 !.claude/PROGRESS.md
 !.claude/DECISIONS.md
