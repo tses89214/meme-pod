@@ -57,3 +57,9 @@
 黑底/白底範本配對邏輯（本回合確認）：黑底範本 (179795066) 配「白字」透明圖，白底範本 (179795087) 配「黑字」透明圖——卡片背景色跟文字顏色要對比，跟 `output/` 檔名的 black/white（代表文字顏色，不是底色）是反過來對應的，之後配對時要注意別搞反。
 
 `upload_metadata.json` 這兩筆已標 `uploaded: true`，但檔案本身還有使用者自己先前的未 commit 修改混在一起，沒有一併 commit，留給使用者自己處理。
+
+## 2026-08-04 — Redbubble 上傳偶發 timeout：Selenium command timeout 拉到 600 秒
+第三筆設計（Actions Speak Louder Than Words，重新用 dancing script 字型再上一次，使用者確認即使 metadata 已有 uploaded:true 也要照跑）上傳時，白字配黑範本那版第一次跑遇到 `HTTPConnectionPool ... Read timed out (read timeout=120)`——是 Selenium/urllib3 對單一 command 的預設 120 秒 timeout，跟已知的「換圖後頁面很忙」問題疊加，某次單一操作卡超過 120 秒就直接整個 exception。
+修法：`get_driver()` 建立後呼叫 `driver.command_executor.set_timeout(600)`，把單一 command 的等待上限拉到 10 分鐘。重跑同一版之後成功。
+兩版最終都上架成功（black-text→white 範本、white-text→black 範本各一筆）。
+結論：之後只要遇到這類 read timeout，先檢查是不是這個 command-level timeout 太短，不是流程邏輯錯。
