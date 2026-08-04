@@ -5,21 +5,23 @@ publish_design.py — 字型選好之後，一路發到 Redbubble + Pinterest，
 前提（呼叫這支之前要先做完的事，這些仍然需要人判斷，不自動化）：
   1. quick_meme.py 已經跑過，.last_meme_session.json 裡有這個 text 的 16 字型結果
   2. 使用者已經選好字型
-  3. upload_metadata.json 裡已經有這個 text 的 metadata 條目（title/description/tags/
+  3. 使用者已經選好（或跳過）要放哪個 Redbubble collection（`python rb_upload.py collections` 查現有選項；
+     只能挑既有的，不會自動新增不存在的 collection）
+  4. upload_metadata.json 裡已經有這個 text 的 metadata 條目（title/description/tags/
      main_tag/translations，這段需要人或 Claude 寫文案，不是這支腳本的工作）
 
 這支腳本做的事（全自動，不需要再確認）：
   1. 從 .last_meme_session.json 找出選定字型的黑字/白字圖
-  2. 黑字圖 duplicate 自白底範本、白字圖 duplicate 自黑底範本，上架 Redbubble（各自四語言）
+  2. 黑字圖 duplicate 自白底範本、白字圖 duplicate 自黑底範本，上架 Redbubble（各自四語言 + 指定 collection）
   3. 把送出後拿到的商品網址、uploaded=true 存回 upload_metadata.json
   4. 用商品網址抓真實 mockup 照，發 Pinterest pin，標 pinned=true
   5. 印出最終結果（兩個 Redbubble 商品網址 + Pinterest 發布狀態）
 
 用法：
-  python publish_design.py "<text>" <font>
+  python publish_design.py "<text>" <font> [collection]
 
 例：
-  python publish_design.py "*Actions* /n speak louder than words." dancing
+  python publish_design.py "*Actions* /n speak louder than words." dancing "Dark Tech humor"
 """
 
 import sys
@@ -66,7 +68,7 @@ def find_meta(metadata: list, text: str) -> dict:
     return meta
 
 
-def upload_to_redbubble(meta: dict, images: dict) -> dict:
+def upload_to_redbubble(meta: dict, images: dict, collection: str = None) -> dict:
     """回傳 {'black_template_url':..., 'white_template_url':...}（都是同一設計的商品網址，理論上其實是同一個 work 兩個版本各自的網址）。"""
     urls = {}
     for variant_name, image_path, target_url in [
@@ -76,7 +78,7 @@ def upload_to_redbubble(meta: dict, images: dict) -> dict:
         print(f"-- Redbubble: {variant_name} --", flush=True)
         driver = get_driver()
         try:
-            product_url = fill_design(driver, meta, image_path, submit=True, target_url=target_url)
+            product_url = fill_design(driver, meta, image_path, submit=True, target_url=target_url, collection=collection)
             urls[variant_name] = product_url
             print(f"   -> {product_url}", flush=True)
         finally:
@@ -101,17 +103,18 @@ def publish_pinterest(meta: dict, product_url: str) -> bool:
 
 
 def main():
-    if len(sys.argv) != 3:
+    if len(sys.argv) not in (3, 4):
         print(__doc__)
         sys.exit(1)
     text, font = sys.argv[1], sys.argv[2]
+    collection = sys.argv[3] if len(sys.argv) == 4 else None
 
     images = get_image_paths(text, font)
     metadata = load_json(META_FILE)
     meta = find_meta(metadata, text)
-    print(f"發布：{meta['title']}", flush=True)
+    print(f"發布：{meta['title']}" + (f"（collection: {collection}）" if collection else ""), flush=True)
 
-    urls = upload_to_redbubble(meta, images)
+    urls = upload_to_redbubble(meta, images, collection=collection)
     meta["uploaded"] = True
     if urls.get("white_template"):
         meta["redbubble_url"] = urls["white_template"]

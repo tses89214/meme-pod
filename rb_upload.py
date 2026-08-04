@@ -169,9 +169,37 @@ def enable_all_products(driver):
         print("  ℹ️  Enable All 按鈕找不到（可能已全啟用）")
 
 
-def fill_design(driver, meta: dict, image_path: str, submit: bool = False, target_url: str = None):
+def list_collections(driver) -> list:
+    """列出目前頁面上可選的 collections（name + checkbox id + 是否已勾選）。
+    只能在 duplicate/New Work 表單頁面呼叫（collection 勾選框是這個表單的一部分）。"""
+    return driver.execute_script("""
+        return Array.from(document.querySelectorAll('input[id^="work_group_ids_"]')).map(el => {
+            const label = el.closest('label');
+            return {name: label ? label.getAttribute('title') : null, id: el.id, checked: el.checked};
+        });
+    """)
+
+
+def select_collection(driver, collection_name: str):
+    """勾選指定名稱的 collection，取消勾選其他所有 collection（不新增不存在的名稱，找不到就跳過）。"""
+    from selenium.webdriver.common.by import By
+    collections = list_collections(driver)
+    match = next((c for c in collections if c["name"] == collection_name), None)
+    if not match:
+        names = [c["name"] for c in collections]
+        print(f"  ⚠️  找不到 collection「{collection_name}」，現有：{names}，略過")
+        return
+    for c in collections:
+        el = driver.find_element(By.ID, c["id"])
+        should_check = c["name"] == collection_name
+        if el.is_selected() != should_check:
+            el.click()
+    print(f"  📁 Collection: {collection_name}")
+
+
+def fill_design(driver, meta: dict, image_path: str, submit: bool = False, target_url: str = None, collection: str = None):
     """主填表流程。target_url 預設是空白 New Work，但依規定新品要從既有設計 duplicate 出來，
-    呼叫時應該傳 black/white 範本的 /duplicate 網址。"""
+    呼叫時應該傳 black/white 範本的 /duplicate 網址。collection 給的話會取代範本原本的 collection 勾選。"""
     from selenium.webdriver.common.by import By
     from selenium.webdriver.common.keys import Keys
 
@@ -238,6 +266,13 @@ def fill_design(driver, meta: dict, image_path: str, submit: bool = False, targe
             print(f"  ✏️  [{lang}] description: OK")
         except Exception as e:
             print(f"  ⚠️  description_{lang}: {e}")
+
+    # 2b. Collection（給了才動，不給就保留範本原本勾的）
+    if collection:
+        try:
+            select_collection(driver, collection)
+        except Exception as e:
+            print(f"  ⚠️  collection: {e}")
 
     # 3. Enable all products
     enable_all_products(driver)
@@ -352,11 +387,23 @@ if __name__ == "__main__":
     up.add_argument("idx", type=int, help="設計編號（從 list 查詢）")
     up.add_argument("--submit", action="store_true", help="自動送出表單")
 
+    sub.add_parser("collections", help="列出目前可選的 collections（開一次範本頁查詢）")
+
     args = parser.parse_args()
 
     if args.cmd == "list":
         cmd_list()
     elif args.cmd == "upload":
         cmd_upload(args.idx, args.submit)
+    elif args.cmd == "collections":
+        driver = get_driver()
+        try:
+            driver.get(BLACK_TEMPLATE_DUP_URL)
+            wait_for(driver, "#work_title_en", timeout=150)
+            for c in list_collections(driver):
+                mark = "✅" if c["checked"] else "  "
+                print(f"{mark} {c['name']}")
+        finally:
+            driver.quit()
     else:
         parser.print_help()
