@@ -2,7 +2,7 @@
 
 Prep a batch of Pinterest pins from already-uploaded Redbubble designs. Posting itself stays manual (human clicks "Create Pin" in the Pinterest app) — this skill only prepares the assets/copy/links so the user can paste-and-go.
 
-Status: v1, manual-pilot phase. No bulk-posting automation yet — see "Why manual" below before adding any.
+Status: v1 doc below describes the original manual-pilot phase. **Superseded 2026-08-04** — user explicitly skipped the manual-validation phase and wants posting fully automated (generate design → auto-post to Pinterest, no human click). See DECISIONS.md 2026-08-04 "此決定被使用者明確推翻". The steps below are being reworked; until that's done, treat "Why manual" as historical context, not current policy.
 
 ## Syntax
 
@@ -48,6 +48,16 @@ Decided 2026-08-03: the strategy itself is unvalidated — no Pinterest presence
 8. Work Hard. Stay Humble. Quit Early.
 9. OOO Out Of Time Energy Money
 10. KPI Killing People Inside
+
+## Learned tactics (from external article, 2026-08-04)
+
+Source: https://straightforward.se/blog/creating-a-shopfront-for-your-redbubble-products-on-pinterest — one seller's manual Redbubble→Pinterest workflow. No automation in the source, but the tactics carry over:
+
+- **Board naming**: keyword + brand combo (their example: "Mugs and Cups by Tiokvadrat"), board description up to 500 chars for Pinterest's own search/SEO, pick the closest-matching official category (they used "Home décor" for mugs — for us, closest is probably "Fashion" or similar for tees, need to check what categories exist).
+- **Pin copy formula**: `[what] – [who] – [where] – [when] – [why] – [how]`. Example: "Blue 'Girly Swot' classic mug celebrating clever girls! Perfect gift mug for smart women studying at school, college, or university." Then a branding tagline line: "Design by X. shopname.redbubble.com".
+- **⚠️ Critical gotcha**: Pinterest rejects the whole pin description if it contains a bare `https://` URL. The article's workaround is to write the shop domain without the scheme (`tiokvadrat.redbubble.com`, no `https://`). This matters for our automation — don't put `https://` inside the description text field; the separate destination-link field is a different input and presumably fine with a full URL.
+- **Post-pin validation**: after posting, check (1) image renders right, (2) text/title display correctly, (3) the pin's link actually click-throughs to the right product page. Worth doing as an automated post-publish check too, not just for humans.
+- **Volume**: no fixed cadence — started with about half a dozen pins, then kept going gradually. No stated timeline for when results showed up.
 
 ## Open TODOs (optimize later, per user — don't do these unasked)
 
