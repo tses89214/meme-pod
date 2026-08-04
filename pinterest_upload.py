@@ -92,7 +92,7 @@ def build_pin_copy(meta: dict) -> tuple[str, str]:
     return title, description
 
 
-def fill_and_publish_pin(driver, meta: dict, image_path: Path, product_url: str) -> bool:
+def fill_and_publish_pin(driver, meta: dict, image_path: Path, product_url: str, board: str = BOARD_NAME) -> bool:
     from selenium.webdriver.common.by import By
 
     title, description = build_pin_copy(meta)
@@ -120,7 +120,7 @@ def fill_and_publish_pin(driver, meta: dict, image_path: Path, product_url: str)
 
     driver.find_element(By.CSS_SELECTOR, '[data-test-id="board-dropdown-select-button"]').click()
     time.sleep(1.5)
-    driver.find_element(By.CSS_SELECTOR, f'[data-test-id="board-row-{BOARD_NAME}"]').click()
+    driver.find_element(By.CSS_SELECTOR, f'[data-test-id="board-row-{board}"]').click()
     time.sleep(1)
 
     driver.find_element(By.CSS_SELECTOR, '[data-test-id="board-dropdown-save-button"]').click()
