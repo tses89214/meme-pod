@@ -88,6 +88,8 @@ def get_driver():
         browser_executable_path="/usr/bin/chromium",
         driver_executable_path=str(Path.home() / ".local/share/undetected_chromedriver/chromedriver_arm64"),
     )
+    # Redbubble 換圖後頁面會忙很久，單一指令可能卡超過 selenium 預設 120 秒的 read timeout
+    driver.command_executor.set_timeout(600)
     return driver
 
 
