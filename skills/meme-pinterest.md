@@ -1,8 +1,8 @@
 # /meme-pinterest
 
-Prep a batch of Pinterest pins from already-uploaded Redbubble designs. Posting itself stays manual (human clicks "Create Pin" in the Pinterest app) — this skill only prepares the assets/copy/links so the user can paste-and-go.
+Auto-post pins to Pinterest for already-uploaded Redbubble designs, using the same Selenium/undetected-chromedriver stack as `rb_upload.py` (shared login profile — see `.claude/MEMORY.md`).
 
-Status: v1 doc below describes the original manual-pilot phase. **Superseded 2026-08-04** — user explicitly skipped the manual-validation phase and wants posting fully automated (generate design → auto-post to Pinterest, no human click). See DECISIONS.md 2026-08-04 "此決定被使用者明確推翻". The steps below are being reworked; until that's done, treat "Why manual" as historical context, not current policy.
+Status: v2, being built 2026-08-04. Automation replaces the original manual-pilot plan per user's explicit call (DECISIONS.md 2026-08-04 "此決定被使用者明確推翻"). Pin-builder UI has been explored (selectors below); board creation + full post flow + batch loop not yet written.
 
 ## Syntax
 
@@ -13,10 +13,27 @@ Status: v1 doc below describes the original manual-pilot phase. **Superseded 202
 
 ## Context (read once, don't re-derive every time)
 
-- Pinterest account: Business, category "網路商家或市集", `redbubble.com/people/tses89214/shop` claimed (declared, was in review as of 2026-08-03).
-- No Pinterest API use — everything here is manual posting, no Selenium/bulk-post bot. Evaluated `SoCloseSociety/PinterestBulkPostBot` (22★, MIT, Python+Selenium) on 2026-08-03 — shelved, see below.
-- Single board for now: **"Funny Meme Shirts"**. Don't split into sub-boards until a theme shows real signal in Pinterest Analytics.
+- Pinterest account: Business, category "網路商家或市集", `redbubble.com/people/tses89214/shop` claimed (declared, was in review as of 2026-08-03). Login persisted 2026-08-03 in the same `.rb_chrome_profile` used for Redbubble — confirmed still logged in on fresh browser launches.
+- No Pinterest API — same Selenium + undetected-chromedriver stack as `rb_upload.py`. Evaluated `SoCloseSociety/PinterestBulkPostBot` (22★, MIT, Python+Selenium) on 2026-08-03 — shelved, not needed.
+- Single board for now: **"Funny Meme Shirts"**. Don't split into sub-boards until a theme shows real signal in Pinterest Analytics. **As of 2026-08-04 this board does not exist yet** — account has zero boards, must be created via the pin-builder's "建立圖版" flow before the first real pin.
 - `upload_metadata.json` does NOT store the live Redbubble product URL per design — only text/title/tags/description/translations. Getting the URL for a given title currently means finding it on the shop page by hand (or asking the user to paste it). This is a known gap, not a bug to silently work around.
+
+## Pin-builder UI (explored 2026-08-04, Selenium selectors confirmed)
+
+URL: `https://www.pinterest.com/pin-builder/` — went straight to the create-pin form, no onboarding popup this session (may reappear, handle defensively).
+
+Per-pin dynamic UUID suffix on several element ids (e.g. `pin-draft-title-<uuid>`) — don't hardcode the full id, match by placeholder/aria-label/id-prefix instead:
+
+- Image upload: `input[type="file"][aria-label="上傳檔案"]` (likely works with `.send_keys(path)` same as Redbubble's pattern — not yet tested). Alternate: "儲存自網站" button lets Pinterest pull the image straight from a URL (Save-button style, matches the reference article's workflow) — not yet tested which is more reliable for us.
+- Title: `textarea[placeholder="新增標題"]`
+- Description: NOT a plain input — it's a Draft.js contenteditable div, `div[aria-label="讓所有人知道你的 Pin 內容"]`. Click + send_keys should work but untested; React/Draft.js editors sometimes need the same native-setter+event-dispatch trick used for Redbubble's fields if plain send_keys misbehaves.
+- Destination link: `textarea[placeholder="新增目的地連結"]` — separate field from description, so the "no bare https://" gotcha (see Learned tactics below) only applies to the description text, not this field.
+- Board picker: click `[data-test-id="board-dropdown-select-button"]` to open a flyout with a search box (`[data-test-id="search-boards-field-container"]`) and, if searching an existing board name, presumably `[role="option"]` results (untested — account has no boards yet to verify against). To create a new board: `[data-test-id="create-board-button"]` (opens a further flow, not yet explored — likely name/description/category/privacy fields, not yet mapped).
+- Publish button: `[data-test-id="board-dropdown-save-button"]` (top-right red button, labelled 發布).
+- Publish now vs scheduled: radio inputs `id^="pin-draft-schedule-publish-immediately-"` / `-later-`; "immediately" is selected by default.
+- AI-disclosure toggle/checkboxes: leave off, our art isn't AI-generated-person content.
+
+Not yet done: create-board flow, actually filling+submitting one real pin end to end, verifying the image upload approach, wiring up a batch loop over designs.
 
 ## What to do
 
