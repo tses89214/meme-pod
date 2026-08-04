@@ -86,3 +86,8 @@
 新增 `pinterest_upload.py`（`list`/`batch`/`one <關鍵字>`），跟 `rb_upload.py` 共用同一個瀏覽器 profile/登入。實測：Universe Grant Me Power 用 `one` 指令跑，抓到真實 mockup 照（毛衣實拍）、自動判斷「已建立一個 Pin」成功訊息、自動存回 `pinned: true`，全程沒人手動介入。
 
 Beer 那筆是手動測試時發的，事後補標 `pinned: true`（沒有真的重跑一次自動流程去發第二次）。
+
+## 2026-08-04 — 串成單一指令：`publish_design.py`
+使用者要求把整條流程接起來，但選字型這步依然要留給使用者自己決定（明確講「選字型一樣交給我」）。
+分界線定在：字型選擇 + metadata 文案撰寫（標題/描述/tags/翻譯）是需要判斷的工作，留給人／Claude；選完字型、metadata 寫好之後，剩下全部自動：Redbubble 黑白兩版上架 → 抓商品網址 → Pinterest 發 pin，一個指令 `python publish_design.py "<text>" <font>` 跑完。
+`/meme` skill 的 step 3 已改成呼叫這支，取代舊的 Google Drive 備份路徑（Drive 變成非預設、使用者要才跑）。
