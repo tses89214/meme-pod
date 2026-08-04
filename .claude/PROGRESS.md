@@ -1,9 +1,9 @@
 # PROGRESS
 
 ## 目前狀態（2026-08-04）
-Redbubble duplicate 上傳全流程已實戰驗證成功：「My faith is beer」與「Universe Grant Me Power」兩個設計，各自黑/白字兩版（共 4 筆），全部真的 submit 送出並確認發布成功（Redbubble 回「Congratulations! Your design is published.」，mockup 截圖確認圖片大小比例正常）。`upload_metadata.json` 這兩筆已標 `uploaded: true`（還沒 commit，跟使用者原本那份未 commit 的修改混在一起，留給使用者自己 commit）。
-換圖 selector 確認是 `#select-image-base`。詳見 DECISIONS.md 2026-08-04。單筆全流程（換圖+四語言填表+送出）耗時約 20 分鐘，主因是 Redbubble 換圖後端處理 mockup 慢，非程式問題。
-Pinterest 導流計畫 Phase 1（手動測水溫）規格已定案，寫成 `skills/meme-pinterest.md`，10 支素材已備好文案交給使用者，網址/mockup 圖使用者手動處理中。
+Redbubble 自動上架管線可用且已實戰驗證：3 個設計（My faith is beer、Universe Grant Me Power、Actions Speak Louder Than Words）、黑白共 6 筆，全部真的 submit 上架成功。換圖 selector `#select-image-base`，Selenium command timeout 拉到 600 秒解掉間歇性 timeout。細節見 DECISIONS.md。
+
+Pinterest 決定跳過手動驗證階段，直接做自動發文（使用者明確指示推翻 8/3 的手動優先決定）。已建好「Funny Meme Shirts」board，並成功自動發布第一個真的 pin（My faith is beer，本地圖檔+標題+描述+目的地連結+board 全自動填寫送出，Pinterest 確認「你已建立一個 Pin！」）。技術細節、選擇器、踩過的雷（「儲存自網站」抓不到商品圖）都記在 `skills/meme-pinterest.md`。
 
 ## 已完成
 - 掃過專案結構，確認 `.upload_queue.json` 為空（無待傳項目）。
@@ -17,7 +17,10 @@ Pinterest 導流計畫 Phase 1（手動測水溫）規格已定案，寫成 `ski
 - `.gitignore` 補上 `.rb_chrome_profile/`（內含登入 session/cookie，不可進版控）。
 
 ## 下一步（下次會話上班打卡先看這）
-- Redbubble 上傳管線已經可用（`rb_upload.py` 的 `get_driver()` + `fill_design(target_url=...)`），下次有新設計要上架可以直接照 `rb_batch_upload.py`（在 scratchpad，還沒搬進專案）那個模式跑：黑範本配白字圖、白範本配黑字圖，各 4 語言，submit=True。
-- 目前只跑過 2 個設計驗證，還沒大量跑過（例如一次 10+ 件）的穩定性沒驗證，Cloudflare/處理時間累積起來要注意。
-- Pinterest：等使用者自己抓好 10 支的商品網址+mockup 圖，串上 UTM 後手動貼上 Pinterest；3-4 週後回顧流量訊號。
-- `upload_metadata.json` 有未 commit 的修改（使用者原本的 + 這次新增的 2 筆 uploaded:true），下次動這個檔案前先跟使用者確認要不要一起 commit。
+- Redbubble 上傳管線已經可用（`rb_upload.py` 的 `get_driver()` + `fill_design(target_url=..., submit=True)`），新設計要上架照黑範本配白字圖、白範本配黑字圖的模式跑。只驗證過 3 個設計，大量批次（10+ 件）的穩定性沒測過。
+- Pinterest 自動發文機制可用但還是單支手動觸發，還沒做成批次迴圈。缺口：
+  1. 商品網址目前靠 promote 確認頁的「View」連結現抓，沒有存到 `upload_metadata.json`，之後每次都要重找
+  2. 圖片用的是本地透明設計圖，不是商品 mockup 照（Pinterest 建議 2:3 長寬比，我們是正方形）
+  3. 沒有「哪些設計已經 pin 過」的追蹤，重跑會不會重複發要注意
+  上述都列在 `skills/meme-pinterest.md` 的 Open TODOs，下次可以直接接著做批次版本。
+- `upload_metadata.json` 有未 commit 的修改（使用者原本的 + 這次新增的 2 筆 uploaded:true，Actions 那筆本來就已經是 true），下次動這個檔案前先跟使用者確認要不要一起 commit。

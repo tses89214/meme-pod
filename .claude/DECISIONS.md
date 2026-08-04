@@ -63,3 +63,16 @@
 修法：`get_driver()` 建立後呼叫 `driver.command_executor.set_timeout(600)`，把單一 command 的等待上限拉到 10 分鐘。重跑同一版之後成功。
 兩版最終都上架成功（black-text→white 範本、white-text→black 範本各一筆）。
 結論：之後只要遇到這類 read timeout，先檢查是不是這個 command-level timeout 太短，不是流程邏輯錯。
+
+## 2026-08-04 — Pinterest 自動發文：第一個真的 pin 發布成功
+承接上面「跳過驗證直接接自動發文」的決定，動手做完整流程：
+1. 建 board「Funny Meme Shirts」（帳號原本 0 個 board）——`#boardEditName` 填名稱、`#secret` 不勾（公開）、`[data-test-id="board-form-submit-button"]` 送出，沒卡 CAPTCHA。
+2. 「儲存自網站」踩雷：餵 Redbubble 商品網址進去，Pinterest 抓回來的是頁面雜圖示（大頭貼、愛心 icon），不是商品照，這條路廢了。改回本地檔案直接 `send_keys()` 上傳，跟 Redbubble 那套一樣的招。
+3. 標題／描述／目的地連結／board 選擇，全部一次填對，`board-row-<board 名稱>` 這個選擇器格式很穩定好用。
+4. 送出後拿到「你已建立一個 Pin！」確認彈窗 + 「已儲存到 Funny Meme Shirts」提示，確認真的發布成功。
+
+商品連結來源：目前是從上傳 Redbubble 時的 promote 確認頁（`/studio/promote/<work_id>`）上找文字為「View」的 `<a>` 連結抓 `href`，得到 `redbubble.com/shop/ap/<id>` 這種格式，再自己加 `?utm_source=pinterest&utm_medium=social&utm_campaign=auto`。這個抓法依賴「剛好有 promote 頁網址」，還沒有通用的「給標題就能查到商品網址」機制——這是下一步要補的缺口，見 `skills/meme-pinterest.md` Open TODOs。
+
+圖片目前用本地的透明設計圖（非商品 mockup 照），Pinterest 有跳出「建議長寬比至少 2:3」的非阻擋警告（我們的圖是正方形）。
+
+還沒做：批次迴圈（一次跑多個設計）、真的商品 mockup 圖來源、「哪些設計已經 pin 過」的追蹤欄位。
