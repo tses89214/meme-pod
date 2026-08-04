@@ -17,6 +17,7 @@ import sys
 import json
 import re
 import time
+import random
 import argparse
 import requests
 from pathlib import Path
@@ -66,7 +67,8 @@ def get_mockup_image(product_url: str, dest_dir: Path) -> Path:
 
     matches = MOCKUP_URL_RE.findall(html)
     if matches:
-        candidates = [m.replace("{{%2F}}", "/") for m in matches]
+        # 去重後隨機挑一張，不要每次都拿同一件（findall 順序在同一頁是固定的）
+        candidates = list(dict.fromkeys(m.replace("{{%2F}}", "/") for m in matches))
     else:
         # 沒找到 mockup 就退回 og:image（純設計平面圖，比較差但至少有圖）
         og_match = OG_IMAGE_RE.search(html)
@@ -74,7 +76,7 @@ def get_mockup_image(product_url: str, dest_dir: Path) -> Path:
             raise RuntimeError(f"找不到任何圖片：{product_url}")
         candidates = [og_match.group(1)]
 
-    img_url = candidates[0]
+    img_url = random.choice(candidates)
     dest_dir.mkdir(parents=True, exist_ok=True)
     dest = dest_dir / (img_url.split("/")[-1].split("?")[0])
     img_resp = requests.get(img_url, headers={"User-Agent": USER_AGENT}, timeout=30)
