@@ -125,3 +125,12 @@ Beer 那筆是手動測試時發的，事後補標 `pinned: true`（沒有真的
 還沒動手把這套風格寫進全部設計的 metadata，只在對話裡試寫了 3 個設計的範例文案取得使用者認可。
 
 Hashtag 補充查證：Pinterest 官方 2026 年建議至多 2-5 個 hashtag，排名權重僅約 1%，關鍵字在標題/描述才是主力，加不加都不會扣分。
+
+## 2026-08-05 — 文案全部寫完 + 每日排程接上本機 crontab（不是雲端 /schedule）
+5 種文案風格（搞笑/日記/直白吐槽/tag朋友/瘋癲）幫全部 48 個設計都寫好了，存進 `upload_metadata.json` 的 `pinterest_captions` 欄位（每個設計一個 list，5 個字串）。`pinterest_upload.py` 的 `build_pin_copy()` 改成有這欄位就 `random.choice()`，沒有才退回舊的商品描述當備案。
+
+新增 `pinterest_upload.py daily [count]`：從全部有商品網址的設計（不管 pinned 與否）隨機挑 N 個（不給 count 就隨機 1-2 個，配合使用者要的節奏）重新發文，每次都是新的隨機 caption + 隨機 mockup。這支是給排程用的，跟 `batch`/`one`（只處理還沒 pin 過的新設計）分開。
+
+排程踩了一個大坑：一開始叫了 `/schedule` skill（`RemoteTrigger`），才發現這是建立**雲端** Claude 代理排程，跑在 Anthropic 雲端隔離環境，完全碰不到這台 Pi 本機的瀏覽器 session/`.rb_chrome_profile`/display——用這個排程 `pinterest_upload.py` 一定失敗。改用本機 `crontab`：`20 11 * * *` 執行 `pinterest_upload.py daily`（Asia/Taipei 時區，本機系統時區）。
+
+crontab 安裝過程另外踩一個環境雷：這台機器的 `crontab <file>` 指令，檔案路徑太長/太深層（例如 scratchpad 底下那種長路徑）會讀到一半報 "No such file or directory"（檔案其實存在），解法是先複製到 `/tmp/xxx.txt` 這種短路徑再安裝。已記進 MEMORY.md，下次直接用短路徑，不用重新除錯。

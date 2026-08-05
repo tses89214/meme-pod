@@ -20,3 +20,6 @@
 - `undetected_chromedriver` 需要對 chromedriver 執行檔做 in-place patch（去掉自動化特徵），所以不能直接指向系統唯讀的 `/usr/bin/chromedriver`（PermissionError），要複製一份到使用者可寫路徑（例如 `~/.local/share/undetected_chromedriver/chromedriver_arm64`）再指定 `driver_executable_path`。
 - Redbubble 的 Cloudflare 驗證在 `/portfolio/images/new`、`/portfolio/images/<id>/duplicate` 這類頁面會自動過關，不需要人手動點任何框，純粹是等（實測 30-90 秒內都過了），登入 session 透過 `rb_upload.py` 的 `--user-data-dir`（`.rb_chrome_profile`）持久化，重開全新瀏覽器也記得登入。
 - 同一個 `.rb_chrome_profile` 也拿來登入 Pinterest（2026-08-03 手動登入過一次，跳到 `pinterest.com/business/hub/`），cookie 是分網域存的，Redbubble 和 Pinterest 共用同一份 profile 不會互相干擾。
+- 系統時區是 `Asia/Taipei`，cron 用的是這個本地時區，不是 UTC。
+- 這台機器的 `crontab` 指令有個怪 bug：`crontab <file>` 如果檔案路徑太長／太多層目錄（例如 `/tmp/claude-.../scratchpad/xxx.txt`），會直接吃到一半報 "No such file or directory"（檔案明明存在，`ls`/`cat` 都正常）。解法：先把檔案複製到短路徑（例如 `/tmp/xxx.txt`）再 `crontab` 那個短路徑檔案，成功後可以刪掉。之後要修改 crontab 都用這招，別再花時間除錯同一個問題。
+- `/schedule` skill（`RemoteTrigger`）建立的是 **雲端** Claude 代理排程，跑在 Anthropic 雲端隔離環境，完全碰不到這台 Pi 的本機檔案／瀏覽器 session／display。任何依賴本機瀏覽器自動化（Redbubble/Pinterest 這類）的排程都不能用這個，要用本機 `crontab` 才行。
