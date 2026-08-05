@@ -157,6 +157,24 @@ def cmd_batch():
         _run_one(metadata, meta)
 
 
+def cmd_daily(count: int = None):
+    """每天固定發 N 支：從『全部有商品網址的設計』隨機挑（不管有沒有 pin 過），
+    每次都用隨機 caption + 隨機 mockup，讓同一設計重複曝光時長得不一樣。
+    這是給排程用的，跟 batch/one（只發還沒 pin 過的）不同，batch/one 還是拿來處理新設計。
+    count 沒給就隨機 1-2 支（使用者要求的節奏）。"""
+    if count is None:
+        count = random.randint(1, 2)
+    metadata = load_metadata()
+    pool = [m for m in metadata if m.get("redbubble_url")]
+    if not pool:
+        print("沒有任何設計有商品網址，無法發文")
+        return
+    picks = random.sample(pool, min(count, len(pool)))
+    print(f"今日排程：從 {len(pool)} 個設計裡隨機挑 {len(picks)} 個", flush=True)
+    for meta in picks:
+        _run_one(metadata, meta)
+
+
 def cmd_one(keyword: str):
     metadata = load_metadata()
     meta = next((m for m in metadata if keyword.lower() in m.get("title", "").lower()), None)
@@ -205,6 +223,8 @@ if __name__ == "__main__":
     sub.add_parser("batch", help="批次發布全部待 pin 的設計")
     one = sub.add_parser("one", help="只發一筆")
     one.add_argument("keyword", help="標題關鍵字")
+    daily = sub.add_parser("daily", help="每日排程用：隨機挑 N 個設計重新發文（不管有沒有 pin 過）")
+    daily.add_argument("count", type=int, nargs="?", default=None, help="要發幾支（不給就隨機 1-2 支）")
 
     args = parser.parse_args()
     if args.cmd == "list":
@@ -213,5 +233,7 @@ if __name__ == "__main__":
         cmd_batch()
     elif args.cmd == "one":
         cmd_one(args.keyword)
+    elif args.cmd == "daily":
+        cmd_daily(args.count)
     else:
         parser.print_help()
