@@ -1,17 +1,12 @@
 # PROGRESS
 
 ## 上班打卡先看這（2026-08-05 晚）
-Session 重啟已完成（`claude mcp list` 弄斷 TG plugin 連線的教訓見 MEMORY.md，之後絕對不要再跑裸的 `claude` 指令）。Focus、PRAF 都已經重跑成功，Redbubble 黑白兩版 + Pinterest 全部上架完成，metadata 也都存檔 commit 了。
+Session 重啟已完成（`claude mcp list` 弄斷 TG plugin 連線的教訓見 MEMORY.md，之後絕對不要再跑裸的 `claude` 指令）。Focus、PRAF、以及 Tavily 搜出來的 4 句新語錄（Error 404 Motivation、Sarcasm/frowned upon、I'm Paw-sitive、Silence is golden/duct tape is silver）全部上架完成：Redbubble 黑白兩版 + Pinterest，metadata 都存檔 commit 了。目前 56 個設計。
 
 **目前待辦（按優先序）：**
-1. **4 句新語錄開工中**（metadata 已寫好 commit，見 `upload_metadata.json` 最後 4 筆）：
-   - `Error 404 /n *Motivation* /n not found`
-   - `Sarcasm: because /n physical violence is /n *frowned upon*`
-   - `I'm *paw*-sitive`
-   - `*Silence* is golden. /n Duct tape is silver.`
-   照 `/meme` 流程（quick_meme.py 生 16 字型 → 問使用者選字型 → 問 collection → `publish_design.py`）逐句跑完。
-2. **新功能：每天隨機愛心其他設計師的作品**（使用者 2026-08-05 提出，已確認方案）：開 `https://www.redbubble.com/explore/`，隨機愛心 3-5 個作品，不特別篩類別。跟現有 `.rb_chrome_profile` 共用登入。要新增一支腳本（例如 `rb_explore_like.py`），排程時間跟 Pinterest daily cron 錯開、避免搶同一個瀏覽器 profile。還沒動工。
-3. **每週語錄搜尋排程**：`quote_search.py` 已寫好測過（含 2026-08-05 新增的「毒舌」類別），但排程本身還沒接上——「挑選+排版建議」需要 Claude 判斷，純 cron 腳本做不到。要測 `claude -p` 非互動模式能不能正常用 telegram plugin reply（**絕對不要跑 `claude mcp list`**），測成再裝進本機 crontab。
+1. **新功能：每天隨機愛心其他設計師的作品**（使用者 2026-08-05 提出，已確認方案）：開 `https://www.redbubble.com/explore/`，隨機愛心 3-5 個作品，不特別篩類別。跟現有 `.rb_chrome_profile` 共用登入。要新增一支腳本（例如 `rb_explore_like.py`），排程時間跟 Pinterest daily cron 錯開、避免搶同一個瀏覽器 profile。還沒動工。
+2. **每週語錄搜尋排程**：`quote_search.py` 已寫好測過（含 2026-08-05 新增的「毒舌」類別），但排程本身還沒接上——「挑選+排版建議」需要 Claude 判斷，純 cron 腳本做不到。要測 `claude -p` 非互動模式能不能正常用 telegram plugin reply（**絕對不要跑 `claude mcp list`**），測成再裝進本機 crontab。
+3. Pinterest caption 裡 emoji 的坑（BMP 外字元讓 ChromeDriver 直接丟例外）已經在 `pinterest_upload.py` 的 `build_pin_copy()` 修掉了，之後寫新文案不用刻意避開 emoji，腳本會自動濾掉。
 
 ## 目前狀態（2026-08-05）
 Redbubble + Pinterest 全自動管線都打通並跑過真實資料。目前 48 個設計，44 個有商品網址並發過 Pinterest（4 筆對不到網址擱置，見下）。
