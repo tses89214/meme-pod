@@ -140,3 +140,14 @@ crontab 安裝過程另外踩一個環境雷：這台機器的 `crontab <file>` 
 修法：兩支腳本都改成「即用即讀最新檔案、只更新這一筆（用 `text` 欄位比對）、立刻存檔」，不再拿舊的整包陣列去蓋檔案。Focus、PRAF 的 metadata 從 git 歷史救回來，順便幫這兩個 + Sip + Fat Otaku 補上遺漏的 5 種 Pinterest 文案（`pinterest_captions`）。
 
 同一次會話另外意外搞出一個新坑：為了驗證「排程能不能連 Telegram MCP」，跑了一次 `claude mcp list`（純粹想看 telegram plugin 健不健康），結果**這個 session 自己的 telegram plugin 子行程直接消失**，`reply` 工具整個叫不出來，沒辦法回 TG 了。細節、之後怎麼避開，記在 MEMORY.md「這台機器跑多個 Telegram bot session」那節——重點是之後絕對不要在 Bash 裡跑裸的 `claude` 指令。
+
+靠 `~/start_all_claude_bots.sh`（每 5 分鐘 cron 檢查 tmux session 存不存在，不存在就用 `--continue` 重開）復原：使用者確認「都弄完之後自己重啟」，等 Focus 那筆的 `publish_design.py` 走到還沒送出（安全可砍）的階段後，主動 `tmux kill-session -t claude_bg_memepod`，5 分鐘內自動重開、TG 連線恢復正常、對話透過 `--continue` 接上。過程中發現砍 session 會讓 Chrome 留下不會自己清的 `SingletonLock`（對應行程其實已經不在了），重啟後第一次重跑 Redbubble 上傳因此卡在 Cloudflare 表單 150 秒沒過，刪掉 `.rb_chrome_profile/SingletonLock`/`SingletonCookie`/`SingletonSocket` 就解了。之後如果又遇到「表單一直載入不出來」但確定帳號沒問題，先檢查是不是這個殘留鎖檔。
+
+## 2026-08-05 — Pinterest caption 不能含 BMP 外字元（多數 emoji）
+PRAF 上架時 Redbubble 兩版都成功，Pinterest 那步卻直接丟 `WebDriverException: unknown error: ChromeDriver only supports characters in the BMP`。根因：文案裡帶了 💸（U+1F4F8，在 Basic Multilingual Plane 之外），ChromeDriver 的 `send_keys` 不支援這種字元，直接拋例外（不是像其他雷那樣默默失敗）。查了一下全部 5 個新設計的文案，🤖🥤📵💸 都中招。
+修法：`pinterest_upload.py` 的 `build_pin_copy()` 存描述前先過濾掉 `ord(ch) > 0xFFFF` 的字元，修在共用函式上，之後寫新文案不用刻意避開 emoji。原本已上架失敗的 PRAF 用 `pinterest_upload.py one "PRAF"` 單獨補跑 Pinterest 那步就好（Redbubble 兩版已經成功，不用重跑，也沒有重複刊登風險）。
+
+## 2026-08-05 — 新增「每天愛心其他設計師作品」自動化
+使用者提出想法：想增加跟其他設計師的互動，問能不能每天開 explore 頁隨機愛心幾個作品。確認方案：純隨機不篩類別、每天 3-5 個（避免看起來像洗版）。
+技術細節：Redbubble UI 上看起來是愛心圖示，但實際 DOM 是 `button[data-testid="add-to-list-button"]`，aria-label 在 "Add to list"/"Remove from list" 間切換，拿這個當成功判斷兼防止重複點擊時誤取消。商品連結來源是 explore 首頁的推薦輪播（`a[class*="MediaCard-styles__link"]`），會混進使用者自己的設計（explore 個人化推薦），過濾條件是 URL 含 `-by-tses89214/`。
+新增 `rb_explore_like.py`，裝進本機 crontab `0 9 * * *`（刻意早於 Pinterest daily 的 11:20，避免兩支腳本搶同一份 `.rb_chrome_profile` 導致其中一支在啟動瀏覽器就掛掉——這個坑今天稍早在 Focus 重跑時已經真的踩過一次）。

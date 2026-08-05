@@ -28,3 +28,10 @@
 - `ps aux` 可看到同時有 4 個 `claude --dangerously-skip-permissions --channels plugin:telegram@claude-plugins-official`，各自用不同 `TELEGRAM_STATE_DIR`（`telegram`＝這個 meme-pod 專案、`telegram-invest`、`telegram-dinner`、`telegram-usstock`），每個各自跑在自己的 tmux session 裡（meme-pod 是 `claude_bg_memepod`），各自有獨立的 `bun run .../telegram/0.0.6 --shell=bun --silent start` 子行程負責維持 MCP 連線。
 - **絕對不要在 Bash 工具裡跑 `claude mcp list`（或任何裸的 `claude` 子行程）**：2026-08-05 實測跑了一次 `claude mcp list` 之後，這個 session（929226）自己的 telegram plugin 子行程整個消失（`ps` 找不到），`mcp__plugin_telegram_telegram__reply` 從此在對話裡完全叫不出來（`ToolSearch` 找不到），導致沒辦法回 TG——踩雷當下完全不知道會有這個副作用，光是查健康狀態就把自己這條線弄斷了。沒有工具能從 session 內部重新接上，只能等外部（使用者重啟那個 tmux session）救。之後要查 MCP 狀態，用 `ToolSearch` 或看 `ps aux` 找 bun 行程，不要呼叫 `claude` 指令本身。
 - Inbound（使用者傳訊息進來）跟 outbound（`reply` 工具送出去）是兩條不同機制：plugin 斷線後使用者的訊息還是收得到（透過 `<channel>` tag），但送不出去，容易誤判「使用者已讀不回」——其實是我方回不去。
+- 復原機制：`~/start_all_claude_bots.sh` 每 5 分鐘跑一次（crontab），偵測對應 tmux session（`claude_bg_memepod` 等）不存在就用 `claude --continue --dangerously-skip-permissions --channels plugin:telegram@claude-plugins-official` 重開，`--continue` 會接上同一個對話。plugin 斷線且無法自救時，`tmux kill-session -t claude_bg_memepod` 是安全的復原手段（會被使用者授權時才做），5 分鐘內自動重開且對話不丟失。
+- 副作用：強制砍 tmux session 會讓 Chrome 留下沒清乾淨的 `.rb_chrome_profile/SingletonLock`（`SingletonCookie`/`SingletonSocket` 也會殘留），對應的行程其實已經不在了。下次啟動瀏覽器如果卡在 Cloudflare 表單一直載入不出來（`wait_for` 150 秒 timeout），先檢查是不是這三個鎖檔還在，`rm` 掉就好，不用懷疑帳號或 Cloudflare 本身出問題。
+
+## Redbubble explore 頁面結構（給 rb_explore_like.py 用）
+- 「愛心」在 UI 上是心型圖示，但 DOM 裡的按鈕是 `button[data-testid="add-to-list-button"]`，Redbubble 內部把這個動作叫 "Add to list"，不是字面上的 favourite/like。`aria-label` 會在 "Add to list"（未愛心）/ "Remove from list"（已愛心）間切換，拿這個判斷點擊有沒有成功，也拿來避免對已經愛心過的作品重複點擊而誤取消。
+- 商品連結來源是 explore 首頁（`/explore/`）的推薦輪播，選擇器 `a[class*="MediaCard-styles__link"]`，href 格式 `/i/<product_type>/<slug>/<work_id>/<variant>`。這頁面會混進使用者自己的設計（explore 個人化推薦的關係），要用 URL 裡的 `-by-<自己的 Redbubble 使用者名稱>/` 濾掉。
+- 這頁面本身不擋 Cloudflare（跟已知的 `/shop/ap/<id>` 商品頁一樣），但點愛心是要登入的動作，還是要用 Selenium + `.rb_chrome_profile` 而非 `requests`。
