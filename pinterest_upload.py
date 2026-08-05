@@ -44,6 +44,19 @@ def save_metadata(metadata: list):
         f.write("\n")
 
 
+def update_metadata_field(text: str, **fields):
+    """安全更新單一欄位：即用即讀最新檔案，只改這筆，立刻存檔。
+    不要把整份 metadata 記在記憶體裡放好幾分鐘才存——這支腳本（尤其 daily 排程）
+    跟其他同時在跑的流程（例如互動中新增設計）搶著存檔會互相蓋掉對方剛加的東西
+    （2026-08-05 真的發生過，Focus 設計整條資料被排程跑的時候蓋掉，靠 git 救回來）。"""
+    metadata = load_metadata()
+    for item in metadata:
+        if item.get("text") == text:
+            item.update(fields)
+            break
+    save_metadata(metadata)
+
+
 def pending_designs(metadata: list) -> list:
     return [
         m for m in metadata
@@ -203,7 +216,7 @@ def _run_one(metadata: list, meta: dict):
         if ok:
             print("  ✅ 發布成功", flush=True)
             meta["pinned"] = True
-            save_metadata(metadata)
+            update_metadata_field(meta["text"], pinned=True)
         else:
             print("  ⚠️  沒看到成功訊息，人工確認一下", flush=True)
     except Exception as e:

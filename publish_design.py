@@ -48,6 +48,20 @@ def save_json(path, data):
         f.write("\n")
 
 
+def update_meta_field(text: str, **fields):
+    """單筆安全更新：重新讀最新檔案、只改這筆、立刻存。
+    這支腳本一輪要跑好幾分鐘（Redbubble 兩次上傳 + Pinterest），
+    不能整個 metadata list 存記憶體裡等結束才整包存檔——
+    跑的過程中若有別的流程（互動新增下一個設計的 metadata）插進來，
+    結束時這一整包覆蓋回去會把插進來的新資料蓋掉。"""
+    metadata = load_json(META_FILE)
+    for item in metadata:
+        if item.get("text") == text:
+            item.update(fields)
+            break
+    save_json(META_FILE, metadata)
+
+
 def get_image_paths(text: str, font: str) -> dict:
     session = load_json(SESSION_FILE)
     if session.get("text") != text:
@@ -116,15 +130,17 @@ def main():
 
     urls = upload_to_redbubble(meta, images, collection=collection)
     meta["uploaded"] = True
+    update_fields = {"uploaded": True}
     if urls.get("white_template"):
         meta["redbubble_url"] = urls["white_template"]
-    save_json(META_FILE, metadata)
+        update_fields["redbubble_url"] = urls["white_template"]
+    update_meta_field(text, **update_fields)
 
     pin_ok = False
     if meta.get("redbubble_url"):
         pin_ok = publish_pinterest(meta, meta["redbubble_url"])
         meta["pinned"] = pin_ok
-        save_json(META_FILE, metadata)
+        update_meta_field(text, pinned=pin_ok)
 
     print("\n=== 完成 ===")
     print(f"Redbubble (white template): {urls.get('white_template')}")
