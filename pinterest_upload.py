@@ -86,9 +86,13 @@ def get_mockup_image(product_url: str, dest_dir: Path) -> Path:
 
 
 def build_pin_copy(meta: dict) -> tuple[str, str]:
-    """標題/描述，description 不能含 https://（Pinterest 會整篇拒絕）。"""
+    """標題/描述，description 不能含 https://（Pinterest 會整篇拒絕）。
+    有 pinterest_captions（5 種風格：搞笑/日記/直白/tag朋友/瘋癲）就隨機抽一個，
+    這樣同一設計重複發文每次口吻都不同；沒有就退回舊的商品描述當備案。"""
     title = meta.get("title", "")[:100]
-    description = meta.get("description", "").replace("https://", "").replace("http://", "")
+    captions = meta.get("pinterest_captions")
+    description = random.choice(captions) if captions else meta.get("description", "")
+    description = description.replace("https://", "").replace("http://", "")
     return title, description
 
 
