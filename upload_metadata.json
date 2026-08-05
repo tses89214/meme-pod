@@ -5601,5 +5601,329 @@
       "Tag the friend who'd cancel plans for puppy cuddles without hesitation.",
       "I NEED DOG TIME RIGHT NOW THIS INSTANT NO SUBSTITUTIONS tag your fellow dog-obsessed bestie immediately"
     ]
+  },
+  {
+    "text": "*Sip* /n a little happiness and joy",
+    "font": "CAVEAT",
+    "title": "A Sip of Happiness and Joy Feel Good Tee",
+    "description": "A little reminder to slow down and savor the good moments. A soft, feel-good tee for anyone who could use a small dose of happiness and joy today.",
+    "tags": [
+      "happiness",
+      "joy",
+      "positive",
+      "feel good",
+      "self care",
+      "gift",
+      "wholesome",
+      "motivational",
+      "mindfulness",
+      "gratitude",
+      "relatable",
+      "meme",
+      "trending",
+      "sentimental"
+    ],
+    "translations": {
+      "en": {
+        "title": "A Sip of Happiness and Joy Feel Good Tee",
+        "main_tag": "happiness",
+        "tags": [
+          "happiness",
+          "joy",
+          "positive",
+          "feel good",
+          "self care",
+          "gift",
+          "wholesome",
+          "motivational",
+          "mindfulness",
+          "gratitude",
+          "relatable",
+          "meme",
+          "trending",
+          "sentimental"
+        ],
+        "description": "A little reminder to slow down and savor the good moments. A soft, feel-good tee for anyone who could use a small dose of happiness and joy today."
+      },
+      "de": {
+        "title": "Ein Schluck Gluck Und Freude Wohlfuehl Shirt",
+        "main_tag": "gluck",
+        "tags": [
+          "gluck",
+          "freude",
+          "positiv",
+          "wohlfuehlen",
+          "selbstfuersorge",
+          "geschenk",
+          "liebevoll",
+          "motivierend",
+          "achtsamkeit",
+          "dankbarkeit",
+          "nachvollziehbar",
+          "meme",
+          "trending",
+          "gefuehlvoll"
+        ],
+        "description": "Eine kleine Erinnerung, langsamer zu machen und die guten Momente zu geniessen. Ein sanftes Wohlfuehl-Shirt fuer alle, die heute eine kleine Portion Glueck und Freude brauchen."
+      },
+      "fr": {
+        "title": "Une Gorgee De Bonheur Et De Joie T-shirt Feel Good",
+        "main_tag": "bonheur",
+        "tags": [
+          "bonheur",
+          "joie",
+          "positif",
+          "feel good",
+          "soin de soi",
+          "cadeau",
+          "bienveillant",
+          "motivant",
+          "pleine conscience",
+          "gratitude",
+          "relatable",
+          "meme",
+          "tendance",
+          "sentimental"
+        ],
+        "description": "Un petit rappel de ralentir et savourer les bons moments. Un t-shirt doux et feel good pour quiconque a besoin d'une petite dose de bonheur et de joie aujourd'hui."
+      },
+      "es": {
+        "title": "Un Sorbo De Felicidad Y Alegria Camiseta Feel Good",
+        "main_tag": "felicidad",
+        "tags": [
+          "felicidad",
+          "alegria",
+          "positivo",
+          "feel good",
+          "autocuidado",
+          "regalo",
+          "entranable",
+          "motivador",
+          "mindfulness",
+          "gratitud",
+          "relatable",
+          "meme",
+          "tendencia",
+          "sentimental"
+        ],
+        "description": "Un pequeno recordatorio para ir mas despacio y saborear los buenos momentos. Una camiseta suave y feel good para quien necesite hoy una pequena dosis de felicidad y alegria."
+      }
+    }
+  },
+  {
+    "text": "*Fat Otaku* /n Happy Water",
+    "font": "FREDOKA ONE",
+    "title": "Fat Otaku Happy Water Funny Soda Meme Tee",
+    "description": "The only happy water that matters. A self-aware, affectionately chaotic tee for anyone whose love language is sugary soda and zero regrets.",
+    "tags": [
+      "soda",
+      "otaku",
+      "funny",
+      "self deprecating humor",
+      "meme",
+      "gift",
+      "nerd culture",
+      "snack",
+      "sarcastic",
+      "relatable",
+      "trending",
+      "viral",
+      "drink humor",
+      "geek"
+    ],
+    "translations": {
+      "en": {
+        "title": "Fat Otaku Happy Water Funny Soda Meme Tee",
+        "main_tag": "soda",
+        "tags": [
+          "soda",
+          "otaku",
+          "funny",
+          "self deprecating humor",
+          "meme",
+          "gift",
+          "nerd culture",
+          "snack",
+          "sarcastic",
+          "relatable",
+          "trending",
+          "viral",
+          "drink humor",
+          "geek"
+        ],
+        "description": "The only happy water that matters. A self-aware, affectionately chaotic tee for anyone whose love language is sugary soda and zero regrets."
+      },
+      "de": {
+        "title": "Fetter Otaku Gluecklichwasser Lustiges Soda Shirt",
+        "main_tag": "soda",
+        "tags": [
+          "soda",
+          "otaku",
+          "lustig",
+          "selbstironie",
+          "meme",
+          "geschenk",
+          "nerd kultur",
+          "snack",
+          "sarkastisch",
+          "nachvollziehbar",
+          "trending",
+          "viral",
+          "getraenke humor",
+          "geek"
+        ],
+        "description": "Das einzige Gluecklichwasser, das zaehlt. Ein selbstironisches, liebevoll chaotisches Shirt fuer alle, deren Liebessprache suesse Limo und null Reue ist."
+      },
+      "fr": {
+        "title": "Otaku Enrobe Eau Du Bonheur T-shirt Soda Humour",
+        "main_tag": "soda",
+        "tags": [
+          "soda",
+          "otaku",
+          "drole",
+          "autoderision",
+          "meme",
+          "cadeau",
+          "culture nerd",
+          "snack",
+          "sarcastique",
+          "relatable",
+          "tendance",
+          "viral",
+          "humour boisson",
+          "geek"
+        ],
+        "description": "La seule eau du bonheur qui compte. Un t-shirt autoderisoire et affectueusement chaotique pour quiconque a pour langage de l'amour le soda sucre et zero regret."
+      },
+      "es": {
+        "title": "Otaku Regordete Agua De La Felicidad Camiseta Soda",
+        "main_tag": "refresco",
+        "tags": [
+          "refresco",
+          "otaku",
+          "gracioso",
+          "autocritica",
+          "meme",
+          "regalo",
+          "cultura nerd",
+          "snack",
+          "sarcastico",
+          "relatable",
+          "tendencia",
+          "viral",
+          "humor bebida",
+          "geek"
+        ],
+        "description": "La unica agua de la felicidad que importa. Una camiseta autocritica y caoticamente entranable para quien tenga como lenguaje del amor el refresco azucarado y cero arrepentimientos."
+      }
+    }
+  },
+  {
+    "text": "*Focus* /n on what's in front of you",
+    "font": "CAVEAT",
+    "title": "Focus on What's in Front of You Motivational Tee",
+    "description": "A simple reminder to stop scrolling and start showing up for what's actually in front of you. A grounding tee for anyone who needs to refocus today.",
+    "tags": [
+      "focus",
+      "motivational",
+      "mindfulness",
+      "present moment",
+      "self improvement",
+      "gift",
+      "inspirational",
+      "relatable",
+      "meme",
+      "trending",
+      "sarcastic",
+      "life advice",
+      "quote",
+      "sentimental"
+    ],
+    "translations": {
+      "en": {
+        "title": "Focus on What's in Front of You Motivational Tee",
+        "main_tag": "focus",
+        "tags": [
+          "focus",
+          "motivational",
+          "mindfulness",
+          "present moment",
+          "self improvement",
+          "gift",
+          "inspirational",
+          "relatable",
+          "meme",
+          "trending",
+          "sarcastic",
+          "life advice",
+          "quote",
+          "sentimental"
+        ],
+        "description": "A simple reminder to stop scrolling and start showing up for what's actually in front of you. A grounding tee for anyone who needs to refocus today."
+      },
+      "de": {
+        "title": "Konzentriere Dich Auf Das Was Vor Dir Ist Shirt",
+        "main_tag": "fokus",
+        "tags": [
+          "fokus",
+          "motivierend",
+          "achtsamkeit",
+          "gegenwart",
+          "selbstverbesserung",
+          "geschenk",
+          "inspirierend",
+          "nachvollziehbar",
+          "meme",
+          "trending",
+          "sarkastisch",
+          "lebensweisheit",
+          "zitat",
+          "gefuehlvoll"
+        ],
+        "description": "Eine einfache Erinnerung, mit dem Scrollen aufzuhoeren und sich dem zu widmen, was wirklich vor einem liegt. Ein erdendes Shirt fuer alle, die sich heute wieder fokussieren muessen."
+      },
+      "fr": {
+        "title": "Concentre-Toi Sur Ce Qui Est Devant Toi T-shirt",
+        "main_tag": "concentration",
+        "tags": [
+          "concentration",
+          "motivant",
+          "pleine conscience",
+          "moment present",
+          "developpement personnel",
+          "cadeau",
+          "inspirant",
+          "relatable",
+          "meme",
+          "tendance",
+          "sarcastique",
+          "conseil de vie",
+          "citation",
+          "sentimental"
+        ],
+        "description": "Un simple rappel d'arreter de scroller et de se concentrer sur ce qui est vraiment devant soi. Un t-shirt ancrant pour quiconque a besoin de se reconcentrer aujourd'hui."
+      },
+      "es": {
+        "title": "Enfocate En Lo Que Tienes Delante Camiseta",
+        "main_tag": "enfoque",
+        "tags": [
+          "enfoque",
+          "motivador",
+          "mindfulness",
+          "momento presente",
+          "superacion personal",
+          "regalo",
+          "inspirador",
+          "relatable",
+          "meme",
+          "tendencia",
+          "sarcastico",
+          "consejo de vida",
+          "cita",
+          "sentimental"
+        ],
+        "description": "Un simple recordatorio para dejar de hacer scroll y empezar a enfocarte en lo que realmente tienes delante. Una camiseta que te centra para quien necesite reenfocarse hoy."
+      }
+    }
   }
 ]
