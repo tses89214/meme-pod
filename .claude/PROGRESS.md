@@ -1,21 +1,17 @@
 # PROGRESS
 
-## 上班打卡先看這（2026-08-05 晚，session 重啟後）
-這個 session 的 Telegram plugin 連線斷了（跑 `claude mcp list` 誤觸的，細節見 MEMORY.md「這台機器跑多個 Telegram bot session」），沒工具能自己重連，靠 `~/start_all_claude_bots.sh`（每 5 分鐘 cron 跑一次）偵測 `claude_bg_memepod` tmux session 不在了才會自動用 `--continue` 重開一個新 session（會接續這個對話，TG 連線是新的、健康的）。若你正在讀這段，代表已經重啟過了。
+## 上班打卡先看這（2026-08-05 晚）
+Session 重啟已完成（`claude mcp list` 弄斷 TG plugin 連線的教訓見 MEMORY.md，之後絕對不要再跑裸的 `claude` 指令）。Focus、PRAF 都已經重跑成功，Redbubble 黑白兩版 + Pinterest 全部上架完成，metadata 也都存檔 commit 了。
 
-**立刻要做的事（使用者已確認、按順序）：**
-1. Focus 的 `publish_design.py` 是使用者主動要求砍掉重跑的（跑到「Redbubble: white_template」那步、mockup 還在重算，還沒按下 submit，所以沒有重複刊登風險，安全可以整個重跑）。PRAF 這次還沒開始跑。重啟後兩個都要從頭跑一次：
-   - Focus：`.last_meme_session.json` 先復原成 `/tmp/claude-1000/-home-tses89214-meme-pod/ca9f4b2a-45cd-42e2-952d-937f266ffbe2/scratchpad/focus_session.json`（這個 scratchpad 路徑是舊 session 的，新 session 可能換了 conversation id 路徑跑掉，找不到就重跑 `quick_meme.py "*Focus* /n on what's in front of you"` 重新生成字型預覽，選字型時挑 CAVEAT 對應那個字型 caveat）→ `python publish_design.py "*Focus* /n on what's in front of you" caveat "Life.exe Has Stopped Working"`
-   - PRAF：同理，`.last_meme_session.json` 復原成 `.../scratchpad/praf_session.json`（一樣路徑可能失效，失效就重跑 `quick_meme.py "My MBTI is /n *PRAF* /n poor as f*ck"`，選 FREDOKA ONE 對應的 fredoka）→ `python publish_design.py "My MBTI is /n *PRAF* /n poor as f*ck" fredoka "Life.exe Has Stopped Working"`
-   - metadata（title/description/tags/translations/pinterest_captions）都已經寫好存在 `upload_metadata.json` 裡了，不用重寫，直接跑 publish_design.py 即可。
-2. 使用者選定 4 句新語錄要開工，照 `/meme` 流程（quick_meme.py 生 16 字型 → 問使用者選字型 → 問 collection → `publish_design.py`）：
+**目前待辦（按優先序）：**
+1. **4 句新語錄開工中**（metadata 已寫好 commit，見 `upload_metadata.json` 最後 4 筆）：
    - `Error 404 /n *Motivation* /n not found`
    - `Sarcasm: because /n physical violence is /n *frowned upon*`
    - `I'm *paw*-sitive`
    - `*Silence* is golden. /n Duct tape is silver.`
-   （這幾句文案/tags/translations 都還沒寫，需要先幫每句寫好 metadata 才能上架，跟平常 /meme 流程一樣）
-   - 已經跑過一次 `quick_meme.py "Error 404 /n *Motivation* /n not found"`（背景 ID bkba1alty，重啟後這個背景工作大概率已經死了，要重跑）。
-3. 這 3 步做完後，回頭看下面「每週語錄搜尋排程」的設計，測試 `claude -p` 非互動模式能不能正常用 telegram plugin reply（**絕對不要跑 `claude mcp list`**，會弄斷自己的連線，教訓見 MEMORY.md），測成再裝 crontab。
+   照 `/meme` 流程（quick_meme.py 生 16 字型 → 問使用者選字型 → 問 collection → `publish_design.py`）逐句跑完。
+2. **新功能：每天隨機愛心其他設計師的作品**（使用者 2026-08-05 提出，已確認方案）：開 `https://www.redbubble.com/explore/`，隨機愛心 3-5 個作品，不特別篩類別。跟現有 `.rb_chrome_profile` 共用登入。要新增一支腳本（例如 `rb_explore_like.py`），排程時間跟 Pinterest daily cron 錯開、避免搶同一個瀏覽器 profile。還沒動工。
+3. **每週語錄搜尋排程**：`quote_search.py` 已寫好測過（含 2026-08-05 新增的「毒舌」類別），但排程本身還沒接上——「挑選+排版建議」需要 Claude 判斷，純 cron 腳本做不到。要測 `claude -p` 非互動模式能不能正常用 telegram plugin reply（**絕對不要跑 `claude mcp list`**），測成再裝進本機 crontab。
 
 ## 目前狀態（2026-08-05）
 Redbubble + Pinterest 全自動管線都打通並跑過真實資料。目前 48 個設計，44 個有商品網址並發過 Pinterest（4 筆對不到網址擱置，見下）。
