@@ -23,3 +23,8 @@
 - 系統時區是 `Asia/Taipei`，cron 用的是這個本地時區，不是 UTC。
 - 這台機器的 `crontab` 指令有個怪 bug：`crontab <file>` 如果檔案路徑太長／太多層目錄（例如 `/tmp/claude-.../scratchpad/xxx.txt`），會直接吃到一半報 "No such file or directory"（檔案明明存在，`ls`/`cat` 都正常）。解法：先把檔案複製到短路徑（例如 `/tmp/xxx.txt`）再 `crontab` 那個短路徑檔案，成功後可以刪掉。之後要修改 crontab 都用這招，別再花時間除錯同一個問題。
 - `/schedule` skill（`RemoteTrigger`）建立的是 **雲端** Claude 代理排程，跑在 Anthropic 雲端隔離環境，完全碰不到這台 Pi 的本機檔案／瀏覽器 session／display。任何依賴本機瀏覽器自動化（Redbubble/Pinterest 這類）的排程都不能用這個，要用本機 `crontab` 才行。
+
+## 這台機器跑多個 Telegram bot session（多支 claude --channels）
+- `ps aux` 可看到同時有 4 個 `claude --dangerously-skip-permissions --channels plugin:telegram@claude-plugins-official`，各自用不同 `TELEGRAM_STATE_DIR`（`telegram`＝這個 meme-pod 專案、`telegram-invest`、`telegram-dinner`、`telegram-usstock`），每個各自跑在自己的 tmux session 裡（meme-pod 是 `claude_bg_memepod`），各自有獨立的 `bun run .../telegram/0.0.6 --shell=bun --silent start` 子行程負責維持 MCP 連線。
+- **絕對不要在 Bash 工具裡跑 `claude mcp list`（或任何裸的 `claude` 子行程）**：2026-08-05 實測跑了一次 `claude mcp list` 之後，這個 session（929226）自己的 telegram plugin 子行程整個消失（`ps` 找不到），`mcp__plugin_telegram_telegram__reply` 從此在對話裡完全叫不出來（`ToolSearch` 找不到），導致沒辦法回 TG——踩雷當下完全不知道會有這個副作用，光是查健康狀態就把自己這條線弄斷了。沒有工具能從 session 內部重新接上，只能等外部（使用者重啟那個 tmux session）救。之後要查 MCP 狀態，用 `ToolSearch` 或看 `ps aux` 找 bun 行程，不要呼叫 `claude` 指令本身。
+- Inbound（使用者傳訊息進來）跟 outbound（`reply` 工具送出去）是兩條不同機制：plugin 斷線後使用者的訊息還是收得到（透過 `<channel>` tag），但送不出去，容易誤判「使用者已讀不回」——其實是我方回不去。

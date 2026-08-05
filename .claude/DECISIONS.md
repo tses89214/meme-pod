@@ -134,3 +134,9 @@ Hashtag 補充查證：Pinterest 官方 2026 年建議至多 2-5 個 hashtag，�
 排程踩了一個大坑：一開始叫了 `/schedule` skill（`RemoteTrigger`），才發現這是建立**雲端** Claude 代理排程，跑在 Anthropic 雲端隔離環境，完全碰不到這台 Pi 本機的瀏覽器 session/`.rb_chrome_profile`/display——用這個排程 `pinterest_upload.py` 一定失敗。改用本機 `crontab`：`20 11 * * *` 執行 `pinterest_upload.py daily`（Asia/Taipei 時區，本機系統時區）。
 
 crontab 安裝過程另外踩一個環境雷：這台機器的 `crontab <file>` 指令，檔案路徑太長/太深層（例如 scratchpad 底下那種長路徑）會讀到一半報 "No such file or directory"（檔案其實存在），解法是先複製到 `/tmp/xxx.txt` 這種短路徑再安裝。已記進 MEMORY.md，下次直接用短路徑，不用重新除錯。
+
+## 2026-08-05 — upload_metadata.json 競態條件修好；意外把自己的 TG 連線弄斷
+早上發現 Focus、後來又發現 PRAF 的 metadata 整筆消失。查了 git 歷史抓包：兇手是 `publish_design.py`／`pinterest_upload.py` 各自的存檔邏輯——一輪跑好幾分鐘，中途把整包 metadata 存記憶體裡，結束才整包蓋回檔案。這中間如果我另外用 Edit 幫下一個設計寫 metadata 進去，等前一輪存檔那刻就把新加的蓋掉了（不是 cron 造成的——有查 `pinterest_daily.log`，cron 那次其實是撞上我同時在跑的互動瀏覽器搶同一份 `.rb_chrome_profile`，直接在啟動瀏覽器那步就整個掛掉，連檔案都還沒碰到）。
+修法：兩支腳本都改成「即用即讀最新檔案、只更新這一筆（用 `text` 欄位比對）、立刻存檔」，不再拿舊的整包陣列去蓋檔案。Focus、PRAF 的 metadata 從 git 歷史救回來，順便幫這兩個 + Sip + Fat Otaku 補上遺漏的 5 種 Pinterest 文案（`pinterest_captions`）。
+
+同一次會話另外意外搞出一個新坑：為了驗證「排程能不能連 Telegram MCP」，跑了一次 `claude mcp list`（純粹想看 telegram plugin 健不健康），結果**這個 session 自己的 telegram plugin 子行程直接消失**，`reply` 工具整個叫不出來，沒辦法回 TG 了。細節、之後怎麼避開，記在 MEMORY.md「這台機器跑多個 Telegram bot session」那節——重點是之後絕對不要在 Bash 裡跑裸的 `claude` 指令。
