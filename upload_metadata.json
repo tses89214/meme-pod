@@ -6177,14 +6177,16 @@
         "description": "El clasico mensaje de error, pero esta vez es sobre levantarse de la cama. Para quien perdio toda su motivacion."
       }
     },
-    "uploaded": false,
+    "uploaded": true,
     "pinterest_captions": [
       "My brain when someone asks if I'm motivated today: Error 404.",
       "Dear diary, tried to find my motivation this morning. Server returned 404.",
       "Error 404: Motivation not found. Try again never.",
       "Tag the friend whose motivation permanently 404'd.",
       "ERROR 404. MOTIVATION NOT FOUND. TRY REFRESHING YOUR LIFE. tag whoever needs this shirt today"
-    ]
+    ],
+    "redbubble_url": "https://www.redbubble.com/shop/ap/182764176",
+    "pinned": true
   },
   {
     "text": "*Sarcasm* /n because /n physical violence is /n frowned upon",
