@@ -7577,13 +7577,15 @@
         "description": "El descargo universal del desarrollador. No es nuestro problema si no funciona en la tuya."
       }
     },
-    "uploaded": false,
+    "uploaded": true,
     "pinterest_captions": [
       "It works on my computer. That's QA's problem now. Tag someone who's said this exact sentence in a standup.",
       "Dear diary, closed another bug ticket today by declaring it works on my computer. Tagging whoever else uses this defense.",
       "It works on my computer. Ticket closed. Tag the person this recipe describes perfectly.",
       "Tag the dev who's used 'works on my machine' as a legitimate defense.",
       "IT WORKS ON MY COMPUTER. NOT MY PROBLEM ANYMORE. tag every developer who's said this and meant it"
-    ]
+    ],
+    "redbubble_url": "https://www.redbubble.com/shop/ap/182792336",
+    "pinned": true
   }
 ]
