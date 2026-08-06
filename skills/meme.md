@@ -18,9 +18,9 @@ Generate a meme T-shirt design preview from text, send a 2×3 font preview grid 
 
 ## What to do
 
-1. Run the generator:
+1. Run the generator (remote by default — cjs-dev renders in ~1 min vs 5-10 min on this Pi; falls back to local `python quick_meme.py "<text>"` if cjs-dev is unreachable):
    ```bash
-   cd ~/meme-pod && python quick_meme.py "<text>"
+   cd ~/meme-pod && ./quick_meme_remote.sh "<text>"
    ```
    Capture the output path (last line printed = path to `_preview_grid_latest.png`).
 
