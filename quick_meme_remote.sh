@@ -11,7 +11,12 @@ REMOTE="root@cjs-dev"
 REMOTE_DIR="/home/tses89214/meme-pod"
 LOCAL_DIR="/home/tses89214/meme-pod"
 
-rsync -az "$LOCAL_DIR/design_generator.py" "$LOCAL_DIR/quick_meme.py" "$REMOTE:$REMOTE_DIR/"
-ssh "$REMOTE" "cd $REMOTE_DIR && python3 quick_meme.py \"$TEXT\""
-rsync -az "$REMOTE:$REMOTE_DIR/output/" "$LOCAL_DIR/output/"
-rsync -az "$REMOTE:$REMOTE_DIR/.last_meme_session.json" "$LOCAL_DIR/.last_meme_session.json"
+if ssh -o BatchMode=yes -o ConnectTimeout=5 "$REMOTE" true 2>/dev/null; then
+    rsync -az "$LOCAL_DIR/design_generator.py" "$LOCAL_DIR/quick_meme.py" "$REMOTE:$REMOTE_DIR/"
+    ssh "$REMOTE" "cd $REMOTE_DIR && python3 quick_meme.py \"$TEXT\""
+    rsync -az "$REMOTE:$REMOTE_DIR/output/" "$LOCAL_DIR/output/"
+    rsync -az "$REMOTE:$REMOTE_DIR/.last_meme_session.json" "$LOCAL_DIR/.last_meme_session.json"
+else
+    echo "cjs-dev 連不上，改本機跑" >&2
+    cd "$LOCAL_DIR" && python3 quick_meme.py "$TEXT"
+fi
