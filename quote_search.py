@@ -25,6 +25,7 @@ DEFAULT_QUERIES = [
     "short positive motivational one-liner quotes for t-shirts",
     "funny self-deprecating relatable quotes short",
     "creative witty roast insult comebacks short and clever not vulgar",
+    "short dad jokes puns funny for t-shirts",
 ]
 
 
