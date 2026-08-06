@@ -73,6 +73,7 @@ def main():
 
     picks = run_curation(candidates)
     send_telegram(f"本週語錄搜尋結果：\n\n{picks}")
+    print(picks)
     print("已送出")
 
 
