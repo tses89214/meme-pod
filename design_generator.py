@@ -64,7 +64,7 @@ def load_font(key: str, size: int) -> ImageFont.FreeTypeFont:
 def clean_text(text: str) -> str:
     """清洗梗標題：去掉多餘符號、截短、適合 T 恤呈現。"""
     text = re.sub(r'\[.*?\]|\(.*?\)', '', text)
-    text = re.sub(r'[^\w\s\'\"\-\!\?\:\,\.\*\/]', ' ', text)
+    text = re.sub(r'[^\w\s\'\"\-\!\?\:\,\.\*\/\%\=\&\#\@\+]', ' ', text)
     text = re.sub(r'\s+', ' ', text).strip()
     if len(text) > 120:
         text = text[:117] + "..."
