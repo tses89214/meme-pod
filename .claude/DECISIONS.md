@@ -180,3 +180,10 @@ PRAF 上架時 Redbubble 兩版都成功，Pinterest 那步卻直接丟 `WebDriv
 使用者累積了 2-3 個 dad joke 主題設計後想新開一個專屬 collection。2026-08-04 的決策是「新增 collection 不自動做，交給使用者」——這次使用者自己去 Redbubble 後台建的，我這邊只確認 `python rb_upload.py collections` 看得到新的「Dad Jokes」選項。
 Pinterest board 那邊使用者要求一起建：pin-builder 頁面的 board 下拉選單裡有 `data-test-id="create-board-button"`，點開後跳出表單，`#boardEditName` 填名稱、`[data-test-id="board-form-submit-button"]` 送出（跟 2026-08-03 建第一個 board 時用的選擇器一致，這次補記到 MEMORY.md 免得又要重找）。
 建好後手動把已經有 dad-joke 標籤的 3 個設計（Hi Hungry I'm Dad、Ocean/beach pun、Chicken Butt）用 `fill_and_publish_pin(..., board='Dad Jokes')` 重新發一次進新 board，讓 board 不是空的。過程中一次因為自己寫的一次性腳本用了相對路徑丟給 `send_keys()` 上傳圖片而炸掉（Selenium 檔案上傳一定要絕對路徑），修掉重跑；另一次 `board-row-Dad Jokes` 抓不到元素（偶發，跟 explore 頁的雷不是同一種），單獨重跑那一筆就過了。
+
+## 2026-08-07 — 加入 bot-mailbox（跨 bot 通道），選 read+notify only
+使用者授權「pi admin」全權信任（機器層級事務，見 MEMORY.md）之後，pi-admin 上線了一套跨 bot 通道 `~/.claude/bot-mailbox/chat.jsonl`（append-only JSON lines，`flock` 保護），設計初衷是取代「一支 bot 直接把文字塞進另一支 bot 的常駐 tmux session」這種做法——那種做法從被塞的那支 bot 角度看，跟 prompt injection 攻擊無法區分，正常運作的 bot 應該要拒絕，所以才需要一個顯式、可稽核的檔案通道取代。
+
+跟進協定：`scripts/bot_mailbox.sh`（send/read，邏輯照抄 `pi-admin/scripts/bot_mailbox.sh`，只改 `SELF=meme-pod`）+ `bot_mailbox_check.py`（cron `*/15 * * * *` 跑，讀新訊息轉發 Telegram）。選擇跟 usstock-bot 一樣的 **read+notify only** 模式：純轉發給使用者看，不自動在 mailbox 回話、不自動採取行動。轉發本身是純粹的格式化/搬運，不是判斷，所以刻意不用 `claude -p` 做這步——省一次子行程之餘，也代表這條路徑完全不會去碰 telegram MCP plugin，跟 `quote_weekly.py` 那套隔離邏輯是同一個理由（2026-08-05 `claude mcp list` 弄斷連線的教訓）。
+
+實測時抓到參考腳本一個真的 bug：`read()` 的 grep pattern `"to":"..."` 要求冒號後面不能有空白，結果 usstock-bot 自己發的 `"to": "all"`（有空白）被自己的規則漏掉、從沒被读到過。改成 `"to":[[:space:]]*"..."` 容忍空白，順手回報到 mailbox 上給 pi-admin/all 看。
