@@ -35,3 +35,15 @@
 - 「愛心」在 UI 上是心型圖示，但 DOM 裡的按鈕是 `button[data-testid="add-to-list-button"]`，Redbubble 內部把這個動作叫 "Add to list"，不是字面上的 favourite/like。`aria-label` 會在 "Add to list"（未愛心）/ "Remove from list"（已愛心）間切換，拿這個判斷點擊有沒有成功，也拿來避免對已經愛心過的作品重複點擊而誤取消。
 - 商品連結來源是 explore 首頁（`/explore/`）的推薦輪播，選擇器 `a[class*="MediaCard-styles__link"]`，href 格式 `/i/<product_type>/<slug>/<work_id>/<variant>`。這頁面會混進使用者自己的設計（explore 個人化推薦的關係），要用 URL 裡的 `-by-<自己的 Redbubble 使用者名稱>/` 濾掉。
 - 這頁面本身不擋 Cloudflare（跟已知的 `/shop/ap/<id>` 商品頁一樣），但點愛心是要登入的動作，還是要用 Selenium + `.rb_chrome_profile` 而非 `requests`。
+
+## Pinterest board 建立流程
+- 在 pin-builder 頁面（`https://www.pinterest.com/pin-builder/`）點開 board 下拉選單（`[data-test-id="board-dropdown-select-button"]`）後，選單裡會有一個 `[data-test-id="create-board-button"]`，點下去彈出新增表單：`#boardEditName` 填名稱、`[data-test-id="board-form-submit-button"]` 送出。不勾 `#secret` 就是公開 board（跟 2026-08-03 建第一個 board 時的欄位一致）。
+- 用 `fill_and_publish_pin(..., board='<board 名稱>')` 把已有設計發去指定 board 時，`board-row-<名稱>` 這個選擇器偶爾會抓不到元素（`NoSuchElementException`，不是每次都會，原因不明，可能是下拉選單渲染時機問題），單獨重跑那一筆通常就過了，不用大改邏輯。
+- 一次性腳本（不透過 `pinterest_upload.py` 既有函式）要注意 `tmp_dir` 一定要用絕對路徑：Selenium 的檔案上傳欄位 `send_keys()` 不接受相對路徑，會丟 `WebDriverException: path is not absolute`。
+
+## 字型預覽遠端算圖（cjs-dev）
+- `root@cjs-dev` 已有 passwordless SSH（8 core / 15GB RAM，Debian 13 trixie），比這台 Pi 快很多，拿來跑 `quick_meme.py` 純 PIL 算圖（不需要瀏覽器/display，適合丟遠端）。
+- 遠端目錄故意用跟本機一模一樣的絕對路徑 `/home/tses89214/meme-pod/`，這樣 `.last_meme_session.json` 裡存的絕對路徑同步回本機後不用做任何轉換就能直接用（quick_meme.py 存的都是絕對路徑，見 `.last_meme_session.json` 的 `sets[].black/white`）。
+- `fonts/`（638MB）已一次性 rsync 過去，之後 `quick_meme_remote.sh` 每次只同步小檔（`design_generator.py`/`quick_meme.py` 本身）過去、跑完再把 `output/` 和 `.last_meme_session.json` 同步回來。
+- cjs-dev 一開始沒裝 `rsync`，`apt-get update && apt-get install -y rsync` 裝好了（trixie 的套件庫快取需要先 update 才抓得到新版本）。
+- 連不上（`ssh -o BatchMode=yes -o ConnectTimeout=5` 檢查）會自動 fallback 本機 `python3 quick_meme.py`。

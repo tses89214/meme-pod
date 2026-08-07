@@ -1,7 +1,9 @@
 # PROGRESS
 
-## 目前狀態（2026-08-06）
-Redbubble + Pinterest 全自動管線穩定運作中。目前 65 個設計，其中 61 個有商品網址並發過 Pinterest。
+## 目前狀態（2026-08-06 晚）
+Redbubble + Pinterest 全自動管線穩定運作中。目前 69 個設計，全部有商品網址並發過 Pinterest（4 筆更早期的舊設計對不到網址，使用者說先不管，見下）。
+
+新增一個 collection「Dad Jokes」（使用者自己在 Redbubble 後台建的）+ 對應 Pinterest board（我建的，選擇器記在 MEMORY.md），3 個 dad-joke 主題設計都補發進去了。
 
 核心流程：`/meme` 收到新點子 → `quick_meme_remote.sh` 生 16 字型預覽（遠端算，見下）→ 使用者選字型 → 問 collection（查 `python rb_upload.py collections`，只能選現有的）→ `publish_design.py "<text>" <font> [collection]`（Redbubble 黑白兩版 + Pinterest 一次做完，metadata 寫回 `upload_metadata.json`）。字型與 collection 永遠問使用者，文案（標題/描述/tags/翻譯/pinterest_captions）由 Claude 判斷撰寫，**5 種 Pinterest 文案風格全部都要帶 tag 朋友的鉤子**（2026-08-06 補了 61 個設計漏掉這點的 180 句文案，之後新設計直接照這標準寫）。
 
@@ -27,4 +29,5 @@ Redbubble + Pinterest 全自動管線穩定運作中。目前 65 個設計，其
 1. 4 筆舊設計對不到 Redbubble 商品網址，使用者說先不管：Staff Adult Lv.99 Funny Gaming Meme、Orange Juice Sweat Zhongshan Qiang Abstract Chinese Tee、Cat Time Funny Cute Meme Tee、I Believe in Air Conditioner Funny Summer Meme Tee。
 2. Pinterest 個人檔案簡介自動化失敗過（send_keys 漏字元 + JS setter 存不進去），使用者已手動貼過，之後不用再碰。
 3. `design_generator.py` 的 `clean_text()` 白名單 2026-08-06 補了 `% = & # @ +`，如果之後又有符號被靜默濾掉（畫面上文字消失/跟預期不符），先檢查這個白名單，不用重新除錯半天。
-4. `upload_metadata.json` 已 commit 乾淨，65 筆全部同步。
+4. `quote_weekly.py` 週一 10:00 才第一次真的透過 cron 跑，還沒看過真實排程觸發的結果，下次上班可以順便確認 `quote_weekly.log` 有沒有正常產生。
+5. `upload_metadata.json` 已 commit 乾淨，69 筆全部同步。

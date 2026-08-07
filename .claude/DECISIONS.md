@@ -151,3 +151,32 @@ PRAF 上架時 Redbubble 兩版都成功，Pinterest 那步卻直接丟 `WebDriv
 使用者提出想法：想增加跟其他設計師的互動，問能不能每天開 explore 頁隨機愛心幾個作品。確認方案：純隨機不篩類別、每天 3-5 個（避免看起來像洗版）。
 技術細節：Redbubble UI 上看起來是愛心圖示，但實際 DOM 是 `button[data-testid="add-to-list-button"]`，aria-label 在 "Add to list"/"Remove from list" 間切換，拿這個當成功判斷兼防止重複點擊時誤取消。商品連結來源是 explore 首頁的推薦輪播（`a[class*="MediaCard-styles__link"]`），會混進使用者自己的設計（explore 個人化推薦），過濾條件是 URL 含 `-by-tses89214/`。
 新增 `rb_explore_like.py`，裝進本機 crontab `0 9 * * *`（刻意早於 Pinterest daily 的 11:20，避免兩支腳本搶同一份 `.rb_chrome_profile` 導致其中一支在啟動瀏覽器就掛掉——這個坑今天稍早在 Focus 重跑時已經真的踩過一次）。
+
+## 2026-08-06 — 每週語錄排程：用隔離的 claude -p 做判斷，不透過 MCP plugin 送出
+延續 2026-08-05 那次「跑 `claude mcp list` 弄斷自己 TG 連線」的教訓，設計 `quote_weekly.py` 時刻意避開常駐 `--channels` session 用的同一條路徑：
+- 挑選語錄 + 排版建議這段判斷交給 `claude -p --strict-mcp-config --mcp-config '{"mcpServers":{}}' --dangerously-skip-permissions`，明確排除 telegram plugin，這個子行程完全不會去碰 bot token 的 long-poll。實測跑完這個指令，這個 session 自己的 `mcp__plugin_telegram_telegram__reply` 還是叫得出來，隔離確實有效。
+- 結果不透過 MCP `reply` 工具送出，改直接呼叫 Telegram Bot API 的 `sendMessage`（bot token 存在 `~/.claude/channels/telegram/.env` 的 `TELEGRAM_BOT_TOKEN`）。這樣完全不用起 MCP 連線，排程跑的時候不會跟這個對話搶東西。
+- 裝進 crontab `0 10 * * 1`（每週一，跟另外兩支日排程的時間錯開）。
+- 手動測試一輪時發現腳本只印「已送出」沒有把送出的內容存到本機，使用者事後想回頭選幾句時我完全看不到內容（Bot API 也查不到歷史訊息）。改成同時把挑選結果印到 stdout，之後 log 裡就查得到。
+
+## 2026-08-06 — design_generator.py 靜默吃掉 % = 等符號
+使用者要做一個「20% Patience 50% Snacks 30% Curiosity = ME」的配方梗，字型預覽整批圖裡 % 跟 = 都不見了。查到 `clean_text()`（`design_generator.py:67`）用白名單方式清字元，只留 `\w\s'"-!?:,.*\/`，白名單外的字元直接換成空白，不會報錯也不會留痕跡，很難發現。
+修法：白名單加上 `% = & # @ +`，順手把幾個容易在未來梗文字裡出現的符號一起補了，不是每次踩到一個才補一個。順便查了現有 69 個設計的 `text` 欄位有沒有其他被靜默吃掉的字元，只有兩筆已上架設計各用了一個全形驚嘆號/彎引號，影響很小、已上架不回頭改。
+
+## 2026-08-06 — 5 種 Pinterest 文案風格全部要帶 tag 朋友鉤子（補回 2026-08-04 的決策）
+使用者看著一個已上架設計的 Redbubble 說明文字，發現「直白吐槽」那一種文案沒有 tag 朋友的鉤子，回頭查 2026-08-04 的決策原文其實寫得很清楚「五種都要能融入 tag 朋友的鉤子」，但實際寫文案時只有第 4、5 種（tag朋友版、瘋癲版）真的有帶，前 3 種漏掉了——包含最早那組拿來當範本的例子也漏。
+補法：寫一支腳本幫全部 61 個當時有文案的設計、每個設計前 3 種風格的文案尾巴加一句符合語氣的 tag 鉤子（用設計標題算 hash 決定套用哪個模板，同一設計每次重跑結果穩定、不同設計間用詞會不一樣，不是每句都長一樣）。第一輪跑完有 26 句因為模板本身沒有字面上的 "tag" 字（用「dedicating this to...」這種意思到但沒有字面 tag），二次過濾抓出來換掉。之後新設計寫文案直接照齊全的標準寫，不用再補這道。
+
+## 2026-08-06 — 字型預覽算圖搬去遠端 cjs-dev
+`quick_meme.py` 的 16 字型 PIL 算圖在這台 Pi 上常態要 5-10 分鐘。使用者主動提供 `root@cjs-dev`（8 core / 15GB，已有 passwordless SSH），確認後動手串了 `quick_meme_remote.sh`：
+- `fonts/`（638MB）一次性 rsync 過去，之後只需要每次同步小檔（`design_generator.py`/`quick_meme.py` 程式碼本身）。
+- 對方一開始沒裝 `rsync`，用 `apt-get update && apt-get install -y rsync` 裝好（Debian 13 trixie，root 帳號）。
+- 遠端跑完 `quick_meme.py` 後把 `output/` 跟 `.last_meme_session.json` rsync 回本機——**目錄結構刻意用跟本機一模一樣的絕對路徑**（`/home/tses89214/meme-pod/`），這樣 session 檔案裡存的絕對路徑不用做任何轉換，直接就是本機真實存在的檔案路徑（實際瀏覽器上傳圖片是在本機執行的，圖片檔案本身還是得同步回本機）。
+- 實測整個來回（rsync 過去 + 遠端算 + rsync 回來）大約 55 秒，比本機純算圖快 6-10 倍。
+- 使用者要求「連不上就退回本機跑」，加了 `ssh -o BatchMode=yes -o ConnectTimeout=5` 健康檢查，連不上直接 fallback `python3 quick_meme.py`（純本機路徑，零額外延遲）。
+- `/meme` skill 文件已更新成預設呼叫 `quick_meme_remote.sh`。
+
+## 2026-08-06 — 新增 Redbubble collection「Dad Jokes」+ 對應 Pinterest board
+使用者累積了 2-3 個 dad joke 主題設計後想新開一個專屬 collection。2026-08-04 的決策是「新增 collection 不自動做，交給使用者」——這次使用者自己去 Redbubble 後台建的，我這邊只確認 `python rb_upload.py collections` 看得到新的「Dad Jokes」選項。
+Pinterest board 那邊使用者要求一起建：pin-builder 頁面的 board 下拉選單裡有 `data-test-id="create-board-button"`，點開後跳出表單，`#boardEditName` 填名稱、`[data-test-id="board-form-submit-button"]` 送出（跟 2026-08-03 建第一個 board 時用的選擇器一致，這次補記到 MEMORY.md 免得又要重找）。
+建好後手動把已經有 dad-joke 標籤的 3 個設計（Hi Hungry I'm Dad、Ocean/beach pun、Chicken Butt）用 `fill_and_publish_pin(..., board='Dad Jokes')` 重新發一次進新 board，讓 board 不是空的。過程中一次因為自己寫的一次性腳本用了相對路徑丟給 `send_keys()` 上傳圖片而炸掉（Selenium 檔案上傳一定要絕對路徑），修掉重跑；另一次 `board-row-Dad Jokes` 抓不到元素（偶發，跟 explore 頁的雷不是同一種），單獨重跑那一筆就過了。
