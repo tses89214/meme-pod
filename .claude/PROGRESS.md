@@ -1,9 +1,13 @@
 # PROGRESS
 
-## 目前狀態（2026-08-06 晚）
-Redbubble + Pinterest 全自動管線穩定運作中。目前 69 個設計，全部有商品網址並發過 Pinterest（4 筆更早期的舊設計對不到網址，使用者說先不管，見下）。
+## 目前狀態（2026-08-09）
+Redbubble + Pinterest 全自動管線穩定運作中。目前 79 個設計，全部有商品網址並發過 Pinterest（4 筆更早期的舊設計對不到網址，使用者說先不管，見下）。
 
-新增一個 collection「Dad Jokes」（使用者自己在 Redbubble 後台建的）+ 對應 Pinterest board（我建的，選擇器記在 MEMORY.md），3 個 dad-joke 主題設計都補發進去了。
+新增一個 collection「Dad Jokes」（使用者自己在 Redbubble 後台建的）+ 對應 Pinterest board（我建的，選擇器記在 MEMORY.md），本次會話又補發了 3 個 dad-joke 設計進去（Mistakes are proof..., Seafood diet, Certified Dad 單行版+兩行版）。
+
+2026-08-09 新增第二個 collection「Paw Prints & Puns」（寵物人主題，使用者在 Redbubble 後台建的，我建議的名字），一口氣發了 6 個設計進去（Fur mom/dad、My cat/dog owns me、My Dog need me、Purr-fectly exhausted parent）。`quote_search.py` 的 `DEFAULT_QUERIES` 也加了寵物雙關語錄的搜尋類別，之後 `/meme` 點子發想會一起搜。
+
+**多設計連續發布時的已知限制**：`.last_meme_session.json` 一次只能存一個設計的 render 結果，`publish_design.py` 會驗證 `text` 是否匹配。排隊多個設計時，順序是：先把每個設計的字型預覽都跑過、收集好使用者選的字型，寫好全部 metadata，再依序「重新 render → 立刻 publish」一個接一個做，不能提前全部 render 完再一次發布（後面 render 的會蓋掉前面的 session）。
 
 核心流程：`/meme` 收到新點子 → `quick_meme_remote.sh` 生 16 字型預覽（遠端算，見下）→ 使用者選字型 → 問 collection（查 `python rb_upload.py collections`，只能選現有的）→ `publish_design.py "<text>" <font> [collection]`（Redbubble 黑白兩版 + Pinterest 一次做完，metadata 寫回 `upload_metadata.json`）。字型與 collection 永遠問使用者，文案（標題/描述/tags/翻譯/pinterest_captions）由 Claude 判斷撰寫，**5 種 Pinterest 文案風格全部都要帶 tag 朋友的鉤子**（2026-08-06 補了 61 個設計漏掉這點的 180 句文案，之後新設計直接照這標準寫）。
 
@@ -30,4 +34,6 @@ Redbubble + Pinterest 全自動管線穩定運作中。目前 69 個設計，全
 2. Pinterest 個人檔案簡介自動化失敗過（send_keys 漏字元 + JS setter 存不進去），使用者已手動貼過，之後不用再碰。
 3. `design_generator.py` 的 `clean_text()` 白名單 2026-08-06 補了 `% = & # @ +`，如果之後又有符號被靜默濾掉（畫面上文字消失/跟預期不符），先檢查這個白名單，不用重新除錯半天。
 4. `quote_weekly.py` 週一 10:00 才第一次真的透過 cron 跑，還沒看過真實排程觸發的結果，下次上班可以順便確認 `quote_weekly.log` 有沒有正常產生。
-5. `upload_metadata.json` 已 commit 乾淨，69 筆全部同步。
+5. Google Drive 備份 token 過期（`drive_upload.py batch` 2026-08-07 起失敗，`invalid_grant: Token has been expired or revoked`），需要重新走一次 OAuth 授權流程才能繼續備份，這段期間累積的設計圖都還沒備份到 Drive。
+6. `bot_mailbox_check.py` 2026-08-07 改成會用隔離的 `claude -p` 自動回覆純資訊性 mailbox 訊息（規則見 `~/.claude/bot-mailbox/README.md`），還沒實際收過一次別的 bot 主動問問題來驗證這條路徑真的有效。
+7. `upload_metadata.json` 已 commit 乾淨，79 筆全部同步。

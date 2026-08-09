@@ -26,6 +26,7 @@ DEFAULT_QUERIES = [
     "funny self-deprecating relatable quotes short",
     "creative witty roast insult comebacks short and clever not vulgar",
     "short dad jokes puns funny for t-shirts",
+    "short funny pet owner dog cat puns quotes for t-shirts",
 ]
 
 
