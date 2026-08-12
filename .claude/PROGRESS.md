@@ -1,6 +1,10 @@
 # PROGRESS
 
-## 目前狀態（2026-08-09）
+## 目前狀態（2026-08-13）
+新增 collection「漢字 / Bilingual」（台灣小吃雙關/雙語系列），一口氣發了 5 個設計：貢丸（字型 cubic11）、蛋花湯、滷肉飯、牛肉麵、炸雞排（後四個字型 huninn）。4/5 完全成功（黑白範本 + Pinterest 都成功）。**滷肉飯黑底範本 publish 失敗**：`rb_upload.py` 該步驟回傳 `None`（duplicate 頁面網址解析不到商品網址），但整支 process exit code 是 0、Pinterest 仍成功——這是新發現的失敗模式，之前都沒遇過「白底成功、黑底失敗、整體卻顯示完成」的情況，之後每次 publish 都要照實際輸出檔案核對兩個範本的網址，不能只看「=== 完成 ===」那行。已 Telegram 通知使用者，問要不要重跑黑底，**還在等使用者回覆，還沒重跑**。
+目前累計 84 個設計。
+
+## 目前狀態（2026-08-09，舊）
 Redbubble + Pinterest 全自動管線穩定運作中。目前 79 個設計，全部有商品網址並發過 Pinterest（4 筆更早期的舊設計對不到網址，使用者說先不管，見下）。
 
 新增一個 collection「Dad Jokes」（使用者自己在 Redbubble 後台建的）+ 對應 Pinterest board（我建的，選擇器記在 MEMORY.md），本次會話又補發了 3 個 dad-joke 設計進去（Mistakes are proof..., Seafood diet, Certified Dad 單行版+兩行版）。
@@ -30,10 +34,11 @@ Redbubble + Pinterest 全自動管線穩定運作中。目前 79 個設計，全
 技術細節、選擇器、踩過的雷都記在 DECISIONS.md、MEMORY.md 和 `skills/meme-pinterest.md`。
 
 ## 下一步（下次會話上班打卡先看這）
+0. **滷肉飯黑底範本還沒成功發布**（白底已成功：https://www.redbubble.com/shop/ap/182958062）。已問使用者要不要重跑，等回覆再動作，不要自己決定重試。
 1. 4 筆舊設計對不到 Redbubble 商品網址，使用者說先不管：Staff Adult Lv.99 Funny Gaming Meme、Orange Juice Sweat Zhongshan Qiang Abstract Chinese Tee、Cat Time Funny Cute Meme Tee、I Believe in Air Conditioner Funny Summer Meme Tee。
 2. Pinterest 個人檔案簡介自動化失敗過（send_keys 漏字元 + JS setter 存不進去），使用者已手動貼過，之後不用再碰。
 3. `design_generator.py` 的 `clean_text()` 白名單 2026-08-06 補了 `% = & # @ +`，如果之後又有符號被靜默濾掉（畫面上文字消失/跟預期不符），先檢查這個白名單，不用重新除錯半天。
 4. `quote_weekly.py` 週一 10:00 才第一次真的透過 cron 跑，還沒看過真實排程觸發的結果，下次上班可以順便確認 `quote_weekly.log` 有沒有正常產生。
 5. Google Drive 備份 token 過期（`drive_upload.py batch` 2026-08-07 起失敗，`invalid_grant: Token has been expired or revoked`），需要重新走一次 OAuth 授權流程才能繼續備份，這段期間累積的設計圖都還沒備份到 Drive。
 6. `bot_mailbox_check.py` 2026-08-07 改成會用隔離的 `claude -p` 自動回覆純資訊性 mailbox 訊息（規則見 `~/.claude/bot-mailbox/README.md`），還沒實際收過一次別的 bot 主動問問題來驗證這條路徑真的有效。
-7. `upload_metadata.json` 已 commit 乾淨，79 筆全部同步。
+7. `upload_metadata.json` 已 commit 乾淨，84 筆全部同步。

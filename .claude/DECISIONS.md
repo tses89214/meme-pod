@@ -187,3 +187,8 @@ Pinterest board 那邊使用者要求一起建：pin-builder 頁面的 board 下
 跟進協定：`scripts/bot_mailbox.sh`（send/read，邏輯照抄 `pi-admin/scripts/bot_mailbox.sh`，只改 `SELF=meme-pod`）+ `bot_mailbox_check.py`（cron `*/15 * * * *` 跑，讀新訊息轉發 Telegram）。選擇跟 usstock-bot 一樣的 **read+notify only** 模式：純轉發給使用者看，不自動在 mailbox 回話、不自動採取行動。轉發本身是純粹的格式化/搬運，不是判斷，所以刻意不用 `claude -p` 做這步——省一次子行程之餘，也代表這條路徑完全不會去碰 telegram MCP plugin，跟 `quote_weekly.py` 那套隔離邏輯是同一個理由（2026-08-05 `claude mcp list` 弄斷連線的教訓）。
 
 實測時抓到參考腳本一個真的 bug：`read()` 的 grep pattern `"to":"..."` 要求冒號後面不能有空白，結果 usstock-bot 自己發的 `"to": "all"`（有空白）被自己的規則漏掉、從沒被读到過。改成 `"to":[[:space:]]*"..."` 容忍空白，順手回報到 mailbox 上給 pi-admin/all 看。
+
+## 2026-08-13 — 發現新失敗模式：`publish_design.py` 白底成功、黑底失敗，exit code 仍 0
+發「漢字 / Bilingual」collection 5 個設計時，滷肉飯那筆白底範本正常拿到商品網址，黑底範本 `rb_upload.py` 的 duplicate 頁面網址解析失敗、`fill_design()` 回傳 `None`，但整支 `publish_design.py` process 照樣以 exit code 0 結束，`=== 完成 ===` 那行也照樣印出來，只是黑底那欄的值是 `None`。Pinterest 那步也正常成功（吃的是白底的網址）。
+之前只遇過「整支失敗」或「整支成功」，第一次遇到這種半途失敗但外層看起來完成的情況。
+結論：**以後每次 publish 完，一定要實際打開 wait-loop 輸出檔案核對白底跟黑底兩個商品網址是不是都拿到了，不能只看 exit code 或「完成」字樣**（fail loud 原則，見 CLAUDE.md Rule 12）。這筆滷肉飯黑底已回報使用者，等回覆決定要不要重跑，尚未修。
