@@ -49,7 +49,7 @@ def like_one(driver, url: str) -> str:
 
 
 def main():
-    n = int(sys.argv[1]) if len(sys.argv) > 1 else random.randint(3, 5)
+    n = int(sys.argv[1]) if len(sys.argv) > 1 else 20
     driver = get_driver()
     try:
         candidates = collect_product_links(driver)
