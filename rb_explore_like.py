@@ -6,7 +6,7 @@ rb_explore_like.py — 每天隨機愛心幾個 Redbubble explore 頁面上其�
 `.rb_chrome_profile` 登入 session。
 
 用法：
-  python rb_explore_like.py [n]   # n 沒給預設隨機 3-5 個
+  python rb_explore_like.py [n]   # n 沒給預設隨機 20-30 個
 """
 
 import re
@@ -49,7 +49,7 @@ def like_one(driver, url: str) -> str:
 
 
 def main():
-    n = int(sys.argv[1]) if len(sys.argv) > 1 else 20
+    n = int(sys.argv[1]) if len(sys.argv) > 1 else random.randint(20, 30)
     driver = get_driver()
     try:
         candidates = collect_product_links(driver)

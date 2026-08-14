@@ -1,6 +1,23 @@
 # PROGRESS
 
-## 目前狀態（2026-08-13）
+## 目前狀態（2026-08-14）
+「漢字 / Bilingual」collection 再補 4 個台灣小吃設計：珍珠奶茶 (Bubble Tea)、鹽酥雞 (Salt and Pepper Chicken)、蚵仔煎 (Oyster Omelette)、臭豆腐 (Stinky Tofu)，全部字型 huninn，4/4 全部成功（黑白範本 + Pinterest）。
+- 珍珠奶茶：白 https://www.redbubble.com/shop/ap/183001975 / 黑 https://www.redbubble.com/shop/ap/183002660
+- 鹽酥雞：白 https://www.redbubble.com/shop/ap/183003290 / 黑 https://www.redbubble.com/shop/ap/183004010
+- 蚵仔煎：白 https://www.redbubble.com/shop/ap/183004584 / 黑 https://www.redbubble.com/shop/ap/183004844
+- 臭豆腐：白 https://www.redbubble.com/shop/ap/183005289 / 黑 https://www.redbubble.com/shop/ap/183005599
+
+漢字/Bilingual collection 累計 9 個設計，全站累計 88 個設計。
+
+**新發現的失敗模式（今天多次遇到）**：Redbubble white/black template 發布步驟偶爾會卡住——`publish_design.py` process 還活著，但 Chrome renderer process 頂在 ~100% CPU、log 完全沒新輸出，卡 15-30 分鐘。有時等待視窗內自己解決（珍珠奶茶白底、鹽酥雞白底都是這樣），有時真的卡死需要 `kill` process + `pkill -f '.rb_chrome_profile'` 後，用單一 variant 的手動重試修復（跟 08-13 滷肉飯黑底那次一樣的手法：直接呼叫 `fill_design(images['white' 或 'black'], target_url=BLACK_TEMPLATE_DUP_URL 或 WHITE_TEMPLATE_DUP_URL)`）——珍珠奶茶黑底、鹽酥雞黑底、蚵仔煎黑底都是這樣修好的。判斷基準：process 存活但同一步驟 15-20 分鐘內 log 零進度、且有 Chrome renderer process 頂在接近 100% CPU，才視為卡死，不要看到「有點慢」就急著砍。
+
+**另一個新發現**：Pinterest 發布步驟也出現過一次靜默失敗（蚵仔煎，`fill_and_publish_pin` 回傳 `False`，log 沒有任何錯誤訊息），單純重跑 `publish_pinterest()` 就成功，原因未查——如果之後常態發生，要去看 `pinterest_upload.py` 的 `fill_and_publish_pin` 在什麼情況下會靜默回傳 `False`。
+
+**`rb_explore_like.py` 調整**：使用者要求增加互動量，預設按讚數從固定 20 改成隨機 20-30（`random.randint(20, 30)`），crontab 從每天一次(09:00) 改成每天三次(09:00/13:00/20:00)。
+
+**使用者要求新增 Pinterest 版隨機瀏覽按愛心腳本**，規格已確認：每天三次、每次 50 個，流程 homefeed → 點進 pin → 按愛心(`.sSBu24 .gEQpi5 .XjRT60`，Pinterest 的 hashed CSS class，可能不穩定需要 fallback) → 下一個。使用者明確授權：測試出錯直接修不用問。（狀態見下方腳本清單/下一步。）
+
+## 目前狀態（2026-08-13，舊）
 新增 collection「漢字 / Bilingual」（台灣小吃雙關/雙語系列），一口氣發了 5 個設計：貢丸（字型 cubic11）、蛋花湯、滷肉飯、牛肉麵、炸雞排（後四個字型 huninn）。4/5 完全成功（黑白範本 + Pinterest 都成功）。**滷肉飯黑底範本 publish 失敗**：`rb_upload.py` 該步驟回傳 `None`（duplicate 頁面網址解析不到商品網址），但整支 process exit code 是 0、Pinterest 仍成功——這是新發現的失敗模式，之前都沒遇過「白底成功、黑底失敗、整體卻顯示完成」的情況，之後每次 publish 都要照實際輸出檔案核對兩個範本的網址，不能只看「=== 完成 ===」那行。已 Telegram 通知使用者，使用者回覆「重跑」後，寫一支只重跑黑底範本的一次性 script（直接呼叫 `fill_design(images['white'], target_url=BLACK_TEMPLATE_DUP_URL)`，不碰白底、不重跑 Pinterest）重試，**成功**：https://www.redbubble.com/shop/ap/182961877 。至此 5/5 全部成功。
 目前累計 84 個設計。
 
