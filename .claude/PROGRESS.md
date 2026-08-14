@@ -15,7 +15,7 @@
 
 **`rb_explore_like.py` 調整**：使用者要求增加互動量，預設按讚數從固定 20 改成隨機 20-30（`random.randint(20, 30)`），crontab 從每天一次(09:00) 改成每天三次(09:00/13:00/20:00)。
 
-**使用者要求新增 Pinterest 版隨機瀏覽按愛心腳本**，規格已確認：每天三次、每次 50 個，流程 homefeed → 點進 pin → 按愛心(`.sSBu24 .gEQpi5 .XjRT60`，Pinterest 的 hashed CSS class，可能不穩定需要 fallback) → 下一個。使用者明確授權：測試出錯直接修不用問。（狀態見下方腳本清單/下一步。）
+**新增 `pinterest_explore_like.py`**（Pinterest 版隨機瀏覽按愛心，仿 `rb_explore_like.py`）：流程 homefeed → 收集 `/pin/` 連結 → 逐個點進去按「回應」按鈕（aria-label="回應"，不是「儲存」，使用者要的是按愛心不是收藏）。使用者提供的 hashed CSS selector（`.sSBu24 .gEQpi5 .XjRT60`）沒用，改用穩定的 `button[aria-label="回應"]`。踩過的雷：homefeed 是虛擬捲動 DOM，`collect_pin_links()` 抓連結時要包 `try/except StaleElementReferenceException`，不然邊抓邊重繪會炸。成功判斷用 `aria-pressed` 屬性（true=已按），實測 3/3 成功且截圖確認愛心變實心、計數 +1，判斷可靠。預設隨機 45-55 個/次，crontab 每天三次 10:00/14:00/21:00（跟 `rb_explore_like.py` 的 09:00/13:00/20:00 錯開避免搶 Chrome profile）。
 
 ## 目前狀態（2026-08-13，舊）
 新增 collection「漢字 / Bilingual」（台灣小吃雙關/雙語系列），一口氣發了 5 個設計：貢丸（字型 cubic11）、蛋花湯、滷肉飯、牛肉麵、炸雞排（後四個字型 huninn）。4/5 完全成功（黑白範本 + Pinterest 都成功）。**滷肉飯黑底範本 publish 失敗**：`rb_upload.py` 該步驟回傳 `None`（duplicate 頁面網址解析不到商品網址），但整支 process exit code 是 0、Pinterest 仍成功——這是新發現的失敗模式，之前都沒遇過「白底成功、黑底失敗、整體卻顯示完成」的情況，之後每次 publish 都要照實際輸出檔案核對兩個範本的網址，不能只看「=== 完成 ===」那行。已 Telegram 通知使用者，使用者回覆「重跑」後，寫一支只重跑黑底範本的一次性 script（直接呼叫 `fill_design(images['white'], target_url=BLACK_TEMPLATE_DUP_URL)`，不碰白底、不重跑 Pinterest）重試，**成功**：https://www.redbubble.com/shop/ap/182961877 。至此 5/5 全部成功。
@@ -46,6 +46,7 @@ Redbubble + Pinterest 全自動管線穩定運作中。目前 79 個設計，全
 - `quote_search.py`：Tavily 搜語錄候選（毒舌/搞怪/正向/自嘲/roast/dad jokes），純搜尋不判斷，`.env` 存 `TRAVILY_API_KEY`。
 - `quote_weekly.py`：串 `quote_search.py` + 隔離 `claude -p` 判斷 + Telegram Bot API 直送，給 cron 用。
 - `rb_explore_like.py`：explore 頁隨機愛心其他設計師作品，濾掉自己的設計。
+- `pinterest_explore_like.py`：homefeed 隨機瀏覽別人的 pin 按愛心，crontab 每天三次 10:00/14:00/21:00。
 - `quick_meme_remote.sh`：字型預覽遠端算 + 自動 fallback 本機。
 
 技術細節、選擇器、踩過的雷都記在 DECISIONS.md、MEMORY.md 和 `skills/meme-pinterest.md`。
