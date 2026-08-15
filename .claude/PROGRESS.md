@@ -1,6 +1,18 @@
 # PROGRESS
 
-## 目前狀態（2026-08-14）
+## 目前狀態（2026-08-15）
+「漢字 / Bilingual」collection 再補 3 個中文餐點設計：小籠包 (Xiaolongbao)、割包 (Gua Bao)、肉圓 (Bawan)，字型 huninn，3/3 全部成功（黑白範本 + Pinterest）。
+- 小籠包：白 https://www.redbubble.com/shop/ap/183022990 / 黑 https://www.redbubble.com/shop/ap/183023121
+- 割包：白 https://www.redbubble.com/shop/ap/183023391 / 黑 https://www.redbubble.com/shop/ap/183023667
+- 肉圓：白 https://www.redbubble.com/shop/ap/183024086 / 黑 https://www.redbubble.com/shop/ap/183024465
+
+漢字/Bilingual collection 累計 12 個設計，全站累計 91 個設計。
+
+**新發現的失敗模式：Chrome profile 搶佔衝突**——手動跑 `publish_design.py` 跟排程中的 `rb_explore_like.py`（09/13/20:00）或 `pinterest_explore_like.py`（10/14/21:00）如果時間窗重疊，會搶 `.rb_chrome_profile`，導致手動這邊 `SessionNotCreatedException`（連不上 chrome）。今天 13:20 左右發生一次，`pkill -9` 清 chrome process 時，意外把當時還在跑的 `rb_explore_like.py` 13:00 排程也砍掉（該次排程沒跑完就掛了，log 留下 traceback）——不影響大局，下個排程時間會自己再跑。**教訓：清 chrome process 前先 `ps aux | grep -E 'rb_explore_like|pinterest_explore_like'` 確認沒有排程正在跑。**
+
+**另一個新發現：Chrome 有時候 `driver.quit()` 後沒有真的清乾淨**，process 還留著佔用 `.rb_chrome_profile`，下一個設計要發布前最好 `ps aux | grep chromium` 檢查一下，有殘留就 `pkill -9 -f '.rb_chrome_profile'` 再開始。
+
+## 目前狀態（2026-08-14，舊）
 「漢字 / Bilingual」collection 再補 4 個台灣小吃設計：珍珠奶茶 (Bubble Tea)、鹽酥雞 (Salt and Pepper Chicken)、蚵仔煎 (Oyster Omelette)、臭豆腐 (Stinky Tofu)，全部字型 huninn，4/4 全部成功（黑白範本 + Pinterest）。
 - 珍珠奶茶：白 https://www.redbubble.com/shop/ap/183001975 / 黑 https://www.redbubble.com/shop/ap/183002660
 - 鹽酥雞：白 https://www.redbubble.com/shop/ap/183003290 / 黑 https://www.redbubble.com/shop/ap/183004010
