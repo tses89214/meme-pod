@@ -111,8 +111,11 @@ def build_pin_copy(meta: dict) -> tuple[str, str]:
     return title, description
 
 
-def fill_and_publish_pin(driver, meta: dict, image_path: Path, product_url: str, board: str = BOARD_NAME) -> bool:
+def fill_and_publish_pin(driver, meta: dict, image_path: Path, product_url: str, board: str = None) -> bool:
     from selenium.webdriver.common.by import By
+    from selenium.common.exceptions import NoSuchElementException
+
+    board = board or meta.get("collection") or BOARD_NAME
 
     title, description = build_pin_copy(meta)
     link = f"{product_url}?utm_source=pinterest&utm_medium=social&utm_campaign=auto"
@@ -139,7 +142,11 @@ def fill_and_publish_pin(driver, meta: dict, image_path: Path, product_url: str,
 
     driver.find_element(By.CSS_SELECTOR, '[data-test-id="board-dropdown-select-button"]').click()
     time.sleep(1.5)
-    driver.find_element(By.CSS_SELECTOR, f'[data-test-id="board-row-{board}"]').click()
+    try:
+        driver.find_element(By.CSS_SELECTOR, f'[data-test-id="board-row-{board}"]').click()
+    except NoSuchElementException:
+        print(f"  ⚠️  找不到 board「{board}」，改發預設 board「{BOARD_NAME}」", flush=True)
+        driver.find_element(By.CSS_SELECTOR, f'[data-test-id="board-row-{BOARD_NAME}"]').click()
     time.sleep(1)
 
     driver.find_element(By.CSS_SELECTOR, '[data-test-id="board-dropdown-save-button"]').click()

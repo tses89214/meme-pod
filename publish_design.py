@@ -134,6 +134,9 @@ def main():
     if urls.get("white_template"):
         meta["redbubble_url"] = urls["white_template"]
         update_fields["redbubble_url"] = urls["white_template"]
+    if collection:
+        meta["collection"] = collection
+        update_fields["collection"] = collection
     update_meta_field(text, **update_fields)
 
     pin_ok = False
