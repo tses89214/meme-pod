@@ -105,6 +105,10 @@ def build_pin_copy(meta: dict) -> tuple[str, str]:
     title = meta.get("title", "")[:100]
     captions = meta.get("pinterest_captions")
     description = random.choice(captions) if captions else meta.get("description", "")
+    tags = meta.get("tags") or []
+    if tags:
+        hashtags = " ".join(f"#{t.replace(' ', '')}" for t in tags[:5])
+        description = f"{description} {hashtags}"
     description = description.replace("https://", "").replace("http://", "")
     # ChromeDriver send_keys 不支援 BMP 外字元（多數 emoji），會直接丟 WebDriverException
     description = "".join(ch for ch in description if ord(ch) <= 0xFFFF).rstrip()
