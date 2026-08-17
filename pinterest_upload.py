@@ -27,7 +27,7 @@ from rb_upload import get_driver
 
 BASE_DIR = Path(__file__).parent
 META_FILE = BASE_DIR / "upload_metadata.json"
-BOARD_NAME = "Funny Meme Shirts"
+BOARD_NAME = "Funny Sarcastic Meme T-Shirts"
 PIN_BUILDER_URL = "https://www.pinterest.com/pin-builder/"
 
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
@@ -104,14 +104,16 @@ def build_pin_copy(meta: dict) -> tuple[str, str]:
     這樣同一設計重複發文每次口吻都不同；沒有就退回舊的商品描述當備案。"""
     title = meta.get("title", "")[:100]
     captions = meta.get("pinterest_captions")
-    description = random.choice(captions) if captions else meta.get("description", "")
+    caption = random.choice(captions) if captions else ""
+    blurb = meta.get("description", "")
+    description = " ".join(part for part in (caption, blurb) if part) or blurb
     tags = meta.get("tags") or []
     if tags:
         hashtags = " ".join(f"#{t.replace(' ', '')}" for t in tags[:5])
         description = f"{description} {hashtags}"
     description = description.replace("https://", "").replace("http://", "")
     # ChromeDriver send_keys 不支援 BMP 外字元（多數 emoji），會直接丟 WebDriverException
-    description = "".join(ch for ch in description if ord(ch) <= 0xFFFF).rstrip()
+    description = "".join(ch for ch in description if ord(ch) <= 0xFFFF).rstrip()[:500]
     return title, description
 
 
