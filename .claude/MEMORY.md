@@ -40,6 +40,8 @@
 - 在 pin-builder 頁面（`https://www.pinterest.com/pin-builder/`）點開 board 下拉選單（`[data-test-id="board-dropdown-select-button"]`）後，選單裡會有一個 `[data-test-id="create-board-button"]`，點下去彈出新增表單：`#boardEditName` 填名稱、`[data-test-id="board-form-submit-button"]` 送出。不勾 `#secret` 就是公開 board（跟 2026-08-03 建第一個 board 時的欄位一致）。
 - 用 `fill_and_publish_pin(..., board='<board 名稱>')` 把已有設計發去指定 board 時，`board-row-<名稱>` 這個選擇器偶爾會抓不到元素（`NoSuchElementException`，不是每次都會，原因不明，可能是下拉選單渲染時機問題），單獨重跑那一筆通常就過了，不用大改邏輯。
 - 一次性腳本（不透過 `pinterest_upload.py` 既有函式）要注意 `tmp_dir` 一定要用絕對路徑：Selenium 的檔案上傳欄位 `send_keys()` 不接受相對路徑，會丟 `WebDriverException: path is not absolute`。
+- Board 改名流程（2026-08-17 確認）：進 board 頁面（`https://www.pinterest.com/<username>/<board-slug>/`，board 清單可在 `https://www.pinterest.com/<username>/_saved/` 頁面的 body innerText 抓到，每個 board 連結格式是 `/tses892140613/<slug>/`）→ 點右上角「...」按鈕（無固定 test-id，用座標配合 `elementFromPoint` 往上找 `role=button` 的祖先元素）→ 選單裡「編輯資訊和設定」是個 `<button role="menuitem">`，文字在裡面的 `<span>`，一樣要往上找到 BUTTON 標籤才能點（不是 role=button）→ 彈出的 modal 裡名稱欄位是純 `<input>`（無穩定 id/data-test-id），用 `value` 屬性比對現有名稱去抓，抓到後 `Ctrl+A` + `Delete` 清空再打新名稱 → 按「完成」送出。
+- 帳號（tses892140613）目前實際有 10 個 board，除了程式碼知道的幾個，還有 5 個之前建好但沒接進自動化流程的：Gym & Motivation Tees、Wholesome & Fun Lifestyle Tees、Gamer Life Level-Up Tees、Funny Work & Office Meme Tees、Bilingual Chinese Design Tees。2026-08-17 已經把全部 100 個設計的 `collection` 欄位配到對應 board（含這 5 個），`pinterest_upload.py` 發文時已支援依 `meta["collection"]` 自動選 board。
 
 ## 字型預覽遠端算圖（cjs-dev）
 - `root@cjs-dev` 已有 passwordless SSH（8 core / 15GB RAM，Debian 13 trixie），比這台 Pi 快很多，拿來跑 `quick_meme.py` 純 PIL 算圖（不需要瀏覽器/display，適合丟遠端）。

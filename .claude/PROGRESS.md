@@ -1,6 +1,22 @@
 # PROGRESS
 
-## 目前狀態（2026-08-15）
+## 目前狀態（2026-08-17）
+Pinterest 曝光低的問題，整批處理：
+
+1. **Pinterest board 依 collection 分流**：`publish_design.py` 往後發布會把 collection 存進 `upload_metadata.json`（`meta["collection"]`）；`pinterest_upload.py` 的 `fill_and_publish_pin()` 改成優先用 `meta["collection"]` 選 board，找不到對應 board 就退回預設 board（`NoSuchElementException` 自動 fallback，不會整支爆掉）。
+2. **舊資料回填**：100 個設計全部補上 `collection` 欄位——3 批有 commit/PROGRESS 紀錄可查的（漢字/Bilingual 12、Dad Jokes 5、Paw Prints & Puns 6）照原始紀錄回填；發現帳號上其實還有 5 個早就建好、名字取得不錯但沒接進程式碼的 board（Gym & Motivation Tees、Wholesome & Fun Lifestyle Tees、Gamer Life Level-Up Tees、Funny Work & Office Meme Tees、Bilingual Chinese Design Tees），剩下 77 個設計依主題人工分類進這 5 個（28/25/8/8/8/6/5，詳細分布見 git log c860ad8）。
+3. **新建 board**：Pinterest 上補建「漢字 / Bilingual」「Paw Prints & Puns」兩個 board（Dad Jokes 之前就有）。
+4. **預設 board 改名**：`Funny Meme Shirts` → `Funny Sarcastic Meme T-Shirts`（塞進常見搜尋詞），Pinterest 上同步改名，115 個既有 pin 不受影響，繼續當作抓不到對應 collection 時的備援 board。
+5. **pin 描述加 SEO**：`build_pin_copy()` 改成 caption + description 兩段合併（不再兩選一）+ 自動附加前 5 個 tag 當 `#hashtag`，截斷在 500 字內。
+6. **發文量調整**：`pinterest_upload.py daily` 排程從隨機 1-2 篇改成固定兩班各 3 篇（11:20 + 16:20，crontab），一天共 6 篇。
+
+**決策**：Rich Pins 走不通（Redbubble 商品頁沒有 `og:type=product` metadata，且網域驗證需要 Redbubble 自己的權限，賣家做不到）；group board 加人 ROI 偏低（Pinterest 演算法已從 board 中心轉成內容相關性，該策略重要性下降），兩者都決定不投入。刻意把每個設計同時發去主題 board + 預設全部 board 的想法也決定不做——重複發同張圖有洗版疑慮，預設 board 保留 fallback 功能即可，不用手動雙發。
+
+Pinterest Ads 使用者還沒決定，未實作。
+
+效果要等 board 重新學分類，估 1-2 週才會反映在流量上，目前判斷太早。
+
+## 目前狀態（2026-08-15，舊）
 「漢字 / Bilingual」collection 再補 3 個中文餐點設計：小籠包 (Xiaolongbao)、割包 (Gua Bao)、肉圓 (Bawan)，字型 huninn，3/3 全部成功（黑白範本 + Pinterest）。
 - 小籠包：白 https://www.redbubble.com/shop/ap/183022990 / 黑 https://www.redbubble.com/shop/ap/183023121
 - 割包：白 https://www.redbubble.com/shop/ap/183023391 / 黑 https://www.redbubble.com/shop/ap/183023667
