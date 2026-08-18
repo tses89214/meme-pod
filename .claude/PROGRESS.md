@@ -1,6 +1,16 @@
 # PROGRESS
 
-## 目前狀態（2026-08-17）
+## 目前狀態（2026-08-18）
+新增 `pinterest_trends_check.py`：每天 08:30 crontab 排程，Selenium 抓 Pinterest Trends 頁面文字，丟給隔離的 `claude -p` 子行程判斷「趨勢能不能延伸成梗圖 T 恤點子」（不硬套，沒有適合的就明講），結果直接用 Telegram Bot API 傳給使用者（不透過 MCP，避免搶常駐 bot session）。
+
+當天測試產出 3 個點子並全部走完 `/meme` 完整流程發布：
+1. Dressed for Success Crying Inside（font caveat, collection Adult Class System）：白 https://www.redbubble.com/shop/ap/183093771 / 黑 https://www.redbubble.com/shop/ap/183093956
+2. Mode Activated: Zombie Mode（font cubic11, collection Adult Class System）：白 https://www.redbubble.com/shop/ap/183094217 / 黑 https://www.redbubble.com/shop/ap/183094364
+3. My Personality Is a Bunch of Useless Skills（font anton, collection Life.exe Has Stopped Working）：白 https://www.redbubble.com/shop/ap/183094584 / 黑 https://www.redbubble.com/shop/ap/183094696
+
+三個 Pinterest 都成功，都因為 collection 沒有同名 board 退回預設 board（正常 fallback，非 bug）。三個設計的 tags/description 都依使用者要求塞入對應趨勢關鍵字（stylish work attire、skeleton/zombie mode、bag charms）以利趨勢流量。全站累計 103 個設計。
+
+## 目前狀態（2026-08-17，舊）
 Pinterest 曝光低的問題，整批處理：
 
 1. **Pinterest board 依 collection 分流**：`publish_design.py` 往後發布會把 collection 存進 `upload_metadata.json`（`meta["collection"]`）；`pinterest_upload.py` 的 `fill_and_publish_pin()` 改成優先用 `meta["collection"]` 選 board，找不到對應 board 就退回預設 board（`NoSuchElementException` 自動 fallback，不會整支爆掉）。
