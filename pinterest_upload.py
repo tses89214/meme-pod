@@ -68,6 +68,17 @@ MOCKUP_URL_RE = re.compile(
     r'"url":"(https:(?:\{\{%2F\}\}){2}[^"]*square_close_portrait[^"]*x1000[^"]*\.jpg)"'
 )
 OG_IMAGE_RE = re.compile(r'<meta[^>]*(?:property|name)="og:image"[^>]*content="([^"]+)"')
+MOCKUP_HEX_RE = re.compile(r'([0-9a-fA-F]{6})(?::[0-9a-fA-F]+)?,front')
+MOCKUP_DARK_NAME_RE = re.compile(r'(black|dark|charcoal|onyx|navy|graphite)', re.I)
+
+
+def _is_dark_mockup(url: str) -> bool:
+    """redbubble_url 存的固定是黑色印花（白T用）listing，深色底衣服會讓黑字看不見。"""
+    m = MOCKUP_HEX_RE.search(url)
+    if m:
+        r, g, b = (int(m.group(1)[i:i + 2], 16) for i in (0, 2, 4))
+        return 0.299 * r + 0.587 * g + 0.114 * b < 100
+    return bool(MOCKUP_DARK_NAME_RE.search(url))
 
 
 def get_mockup_image(product_url: str, dest_dir: Path) -> Path:
@@ -82,6 +93,9 @@ def get_mockup_image(product_url: str, dest_dir: Path) -> Path:
     if matches:
         # 去重後隨機挑一張，不要每次都拿同一件（findall 順序在同一頁是固定的）
         candidates = list(dict.fromkeys(m.replace("{{%2F}}", "/") for m in matches))
+        # 這個 listing 固定是黑色印花，過濾掉深色底商品避免黑字疊黑底看不到
+        light_candidates = [c for c in candidates if not _is_dark_mockup(c)]
+        candidates = light_candidates or candidates
     else:
         # 沒找到 mockup 就退回 og:image（純設計平面圖，比較差但至少有圖）
         og_match = OG_IMAGE_RE.search(html)
