@@ -1,6 +1,20 @@
 # PROGRESS
 
-## 目前狀態（2026-08-18）
+## 目前狀態（2026-08-19）
+補建 2 個 Pinterest board（`Adult Class System`、`Life.exe Has Stopped Working`），這兩個 Redbubble collection 之前沒有對應 board，發文都退回預設 board，現在帳號共 11 個 board、都對上了。
+
+修 mockup 選圖對比度 bug：`pinterest_upload.py` 的 `get_mockup_image()` 從商品頁隨機挑一張真實照片當 pin 圖，同一 listing 的 26 種商品款式裡少數（如 active_tee）預設是深色，黑字設計疊上去會看不到字。改成依印花顏色（`ink` 參數）過濾掉會撞色的底色（黑字避深色底、白字避淺色底，双向判斷），過濾不到候選才退回原始清單。目前系統只會 pin 黑字版（白T listing），所以白字分支目前用不到，是為了以後萬一發黑T listing 也對的保險。
+
+萬聖節主題 Dad Jokes / Tech Humor 3 個設計走完 `/meme` 全流程：
+1. I'm Not Afraid of Ghosts / I'm Afraid of My WIFE（font caveat, collection Dad Jokes）：白 https://www.redbubble.com/shop/ap/183106867 / 黑 https://www.redbubble.com/shop/ap/183107052
+2. My Scary Costume Monday Morning（font caveat, collection Life.exe Has Stopped Working）：白 https://www.redbubble.com/shop/ap/183108515 / 黑 https://www.redbubble.com/shop/ap/183108688
+3. Trick or Tequila（font pacifico, collection Adult Class System）：白 https://www.redbubble.com/shop/ap/183109092 / 黑 https://www.redbubble.com/shop/ap/183109264
+
+三個 Pinterest 都成功，因為 board 已經補齊，都直接進對應主題 board，沒有退回預設。第 4 個點子（Bug/Haunted House）字型預覽出來使用者覺得醜，取消不發。全站累計 106 個設計。
+
+**新踩雷／教訓**：發布過程中用 `while pgrep -f pinterest_explore_like.py > /dev/null; do sleep 15; done` 等排程結束，結果自己這行指令的完整 command line 本身就含有 `pinterest_explore_like.py` 字串，被自己的 `pgrep -f` 誤抓到，導致以為排程一直在跑，卡等超過 8 小時。之後這種等待迴圈要用更精確的 pattern（例如 `pgrep -f 'python3.*pinterest_explore_like\.py'` 且避開迴圈自身指令，或改成先 `ps aux | grep` 一次性檢查而非在 pgrep 條件式裡放同名字串）。
+
+## 目前狀態（2026-08-18，舊）
 新增 `pinterest_trends_check.py`：每天 08:30 crontab 排程，Selenium 抓 Pinterest Trends 頁面文字，丟給隔離的 `claude -p` 子行程判斷「趨勢能不能延伸成梗圖 T 恤點子」（不硬套，沒有適合的就明講），結果直接用 Telegram Bot API 傳給使用者（不透過 MCP，避免搶常駐 bot session）。
 
 當天測試產出 3 個點子並全部走完 `/meme` 完整流程發布：

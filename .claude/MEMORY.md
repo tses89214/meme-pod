@@ -21,6 +21,7 @@
 - Redbubble 的 Cloudflare 驗證在 `/portfolio/images/new`、`/portfolio/images/<id>/duplicate` 這類頁面會自動過關，不需要人手動點任何框，純粹是等（實測 30-90 秒內都過了），登入 session 透過 `rb_upload.py` 的 `--user-data-dir`（`.rb_chrome_profile`）持久化，重開全新瀏覽器也記得登入。
 - 同一個 `.rb_chrome_profile` 也拿來登入 Pinterest（2026-08-03 手動登入過一次，跳到 `pinterest.com/business/hub/`），cookie 是分網域存的，Redbubble 和 Pinterest 共用同一份 profile 不會互相干擾。
 - 系統時區是 `Asia/Taipei`，cron 用的是這個本地時區，不是 UTC。
+- `pgrep -f <pattern>` 等待迴圈有自我誤判風險：如果 `<pattern>` 這個字串本身也出現在等待迴圈那行指令的完整 command line 裡（例如 `while pgrep -f pinterest_explore_like.py > /dev/null; do sleep 15; done`，這行指令自己就含有 `pinterest_explore_like.py` 字串），`pgrep -f` 會連自己這個 bash process 都算進去，導致條件永遠是 true、迴圈以為排程一直在跑，2026-08-19 因此卡等超過 8 小時（排程其實幾小時前就結束、Chrome 早就閒置）。之後這種等待迴圈要嘛用更精確的 pattern（如 `pgrep -f 'python3.*pinterest_explore_like\.py'`，排除掉自己那行沒有 `python3` 開頭的 bash wrapper），要嘛改成先跑一次 `ps aux | grep` 直接看有沒有真的 python process，不要把要找的字串原封不動放進迴圈本身的指令列。
 - 這台機器的 `crontab` 指令有個怪 bug：`crontab <file>` 如果檔案路徑太長／太多層目錄（例如 `/tmp/claude-.../scratchpad/xxx.txt`），會直接吃到一半報 "No such file or directory"（檔案明明存在，`ls`/`cat` 都正常）。解法：先把檔案複製到短路徑（例如 `/tmp/xxx.txt`）再 `crontab` 那個短路徑檔案，成功後可以刪掉。之後要修改 crontab 都用這招，別再花時間除錯同一個問題。
 - `/schedule` skill（`RemoteTrigger`）建立的是 **雲端** Claude 代理排程，跑在 Anthropic 雲端隔離環境，完全碰不到這台 Pi 的本機檔案／瀏覽器 session／display。任何依賴本機瀏覽器自動化（Redbubble/Pinterest 這類）的排程都不能用這個，要用本機 `crontab` 才行。
 
@@ -42,6 +43,8 @@
 - 一次性腳本（不透過 `pinterest_upload.py` 既有函式）要注意 `tmp_dir` 一定要用絕對路徑：Selenium 的檔案上傳欄位 `send_keys()` 不接受相對路徑，會丟 `WebDriverException: path is not absolute`。
 - Board 改名流程（2026-08-17 確認）：進 board 頁面（`https://www.pinterest.com/<username>/<board-slug>/`，board 清單可在 `https://www.pinterest.com/<username>/_saved/` 頁面的 body innerText 抓到，每個 board 連結格式是 `/tses892140613/<slug>/`）→ 點右上角「...」按鈕（無固定 test-id，用座標配合 `elementFromPoint` 往上找 `role=button` 的祖先元素）→ 選單裡「編輯資訊和設定」是個 `<button role="menuitem">`，文字在裡面的 `<span>`，一樣要往上找到 BUTTON 標籤才能點（不是 role=button）→ 彈出的 modal 裡名稱欄位是純 `<input>`（無穩定 id/data-test-id），用 `value` 屬性比對現有名稱去抓，抓到後 `Ctrl+A` + `Delete` 清空再打新名稱 → 按「完成」送出。
 - 帳號（tses892140613）目前實際有 10 個 board，除了程式碼知道的幾個，還有 5 個之前建好但沒接進自動化流程的：Gym & Motivation Tees、Wholesome & Fun Lifestyle Tees、Gamer Life Level-Up Tees、Funny Work & Office Meme Tees、Bilingual Chinese Design Tees。2026-08-17 已經把全部 100 個設計的 `collection` 欄位配到對應 board（含這 5 個），`pinterest_upload.py` 發文時已支援依 `meta["collection"]` 自動選 board。
+- 2026-08-19 再補建 2 個 board（`Adult Class System`、`Life.exe Has Stopped Working`），帳號共 11 個 board。查目前 board 清單最快的方法：開 `https://www.pinterest.com/pin-builder/`，點 `[data-test-id="board-dropdown-select-button"]` 展開下拉選單，`document.body.innerText` 裡就有完整清單（比爬 `_saved`/`_created` 頁面可靠，那兩頁的 board 連結不是簡單 `<a>` 標籤，抓不到）。
+- Pinterest mockup 選圖有對比度風險：`pinterest_upload.py` 的 `get_mockup_image()` 從商品頁隨機挑一張真實照片當 pin 圖，26 種商品款式裡少數款式（如 active_tee）預設深色，黑字設計疊上去會看不到字。2026-08-19 修成依印花顏色過濾掉撞色的底色（解析 mockup URL 裡的 hex 色碼或顏色名稱，算亮度或比對關鍵字判斷深淺）。系統目前只會 pin 黑字版（白T listing，`redbubble_url` 固定存這個），所以目前只有黑字避深色底這條路徑會被用到。
 
 ## 字型預覽遠端算圖（cjs-dev）
 - `root@cjs-dev` 已有 passwordless SSH（8 core / 15GB RAM，Debian 13 trixie），比這台 Pi 快很多，拿來跑 `quick_meme.py` 純 PIL 算圖（不需要瀏覽器/display，適合丟遠端）。
