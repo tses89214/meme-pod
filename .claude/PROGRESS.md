@@ -1,6 +1,8 @@
 # PROGRESS
 
 ## 目前狀態（2026-08-19）
+修好 `pinterest_trends_check.py` 跟 `quote_weekly.py` 共用的一個 bug：兩支都用 `subprocess.run(["claude", "-p", ...])` 呼叫獨立 claude 子行程，但 crontab 環境 PATH 很陽春，找不到 `claude`（`FileNotFoundError: [Errno 2] No such file or directory: 'claude'`），08-19 早上 08:30 的趨勢排程因此沒送出。改成寫死絕對路徑 `/home/tses89214/.local/bin/claude`，用 `env -i` 模擬陽春 PATH 測過會過。手動補跑當天的趨勢點子成功送出。順便把 `quote_weekly.py` 排程從每週一改成每天 10:00（使用者要求）。
+
 補建 2 個 Pinterest board（`Adult Class System`、`Life.exe Has Stopped Working`），這兩個 Redbubble collection 之前沒有對應 board，發文都退回預設 board，現在帳號共 11 個 board、都對上了。
 
 修 mockup 選圖對比度 bug：`pinterest_upload.py` 的 `get_mockup_image()` 從商品頁隨機挑一張真實照片當 pin 圖，同一 listing 的 26 種商品款式裡少數（如 active_tee）預設是深色，黑字設計疊上去會看不到字。改成依印花顏色（`ink` 參數）過濾掉會撞色的底色（黑字避深色底、白字避淺色底，双向判斷），過濾不到候選才退回原始清單。目前系統只會 pin 黑字版（白T listing），所以白字分支目前用不到，是為了以後萬一發黑T listing 也對的保險。
