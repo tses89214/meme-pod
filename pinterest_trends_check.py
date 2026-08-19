@@ -58,7 +58,7 @@ def scrape_trends() -> str:
 def run_curation(trends_text: str) -> str:
     prompt = CURATION_PROMPT.format(trends_text=trends_text[:4000])
     result = subprocess.run(
-        ["claude", "-p", prompt,
+        ["/home/tses89214/.local/bin/claude", "-p", prompt,
          "--strict-mcp-config", "--mcp-config", '{"mcpServers":{}}',
          "--dangerously-skip-permissions"],
         cwd=BASE_DIR, capture_output=True, text=True, timeout=300,

@@ -36,7 +36,7 @@ CURATION_PROMPT = """以下是從 Tavily 搜到的英文語錄候選（跨搞怪
 def run_curation(candidates: str) -> str:
     prompt = CURATION_PROMPT.format(candidates=candidates)
     result = subprocess.run(
-        ["claude", "-p", prompt,
+        ["/home/tses89214/.local/bin/claude", "-p", prompt,
          "--strict-mcp-config", "--mcp-config", '{"mcpServers":{}}',
          "--dangerously-skip-permissions"],
         cwd=BASE_DIR, capture_output=True, text=True, timeout=300,
