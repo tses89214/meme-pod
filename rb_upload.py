@@ -181,17 +181,19 @@ def list_collections(driver) -> list:
 
 
 def select_collection(driver, collection_name: str):
-    """勾選指定名稱的 collection，取消勾選其他所有 collection（不新增不存在的名稱，找不到就跳過）。"""
+    """勾選指定名稱的 collection，取消勾選其他所有 collection（不新增不存在的名稱，找不到就跳過）。
+    部分舊 collection 建立時名稱裡的 & 被存成字面上的 &amp;，比對時要正規化避免漏配。"""
     from selenium.webdriver.common.by import By
+    norm = lambda s: s.replace("&amp;", "&") if s else s
     collections = list_collections(driver)
-    match = next((c for c in collections if c["name"] == collection_name), None)
+    match = next((c for c in collections if norm(c["name"]) == norm(collection_name)), None)
     if not match:
         names = [c["name"] for c in collections]
         print(f"  ⚠️  找不到 collection「{collection_name}」，現有：{names}，略過")
         return
     for c in collections:
         el = driver.find_element(By.ID, c["id"])
-        should_check = c["name"] == collection_name
+        should_check = norm(c["name"]) == norm(collection_name)
         if el.is_selected() != should_check:
             el.click()
     print(f"  📁 Collection: {collection_name}")
