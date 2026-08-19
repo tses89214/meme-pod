@@ -1,5 +1,14 @@
 # PROGRESS
 
+## 目前狀態（2026-08-19，續）
+Pinterest 趨勢點子（Battery 1%/Attitude 100%、My only paparazzi is my dog）走完 `/meme` 全流程：
+- Battery 1% Attitude 100%（font anton, collection Life.exe Has Stopped Working）：白 https://www.redbubble.com/shop/ap/183119136 / 黑 https://www.redbubble.com/shop/ap/183119344，Pinterest 成功
+- My Only Paparazzi Is My Dog（font pacifico, collection Paw Prints & Puns）：白 https://www.redbubble.com/shop/ap/183119699 / 黑 https://www.redbubble.com/shop/ap/183119921，Pinterest 成功，但 **Redbubble collection 沒對到**
+
+發現並修一個新 bug：`rb_upload.py` 的 `select_collection()` 純字串比對 collection 名稱，但「Paw Prints & Puns」這個 collection 在 Redbubble 後端存的名稱字面上是「Paw Prints &amp; Puns」（建立時 & 被存成 HTML entity），比對失去等於永遠找不到、直接跳過分類。已修成比對前正規化（`&amp;` → `&`），commit 了，之後新設計會正確分類。
+
+**未解決**：上面 dog 設計那兩個商品因為建立當下踩到這個 bug，被 Redbubble 預設繼承了複製範本原本的 collection「Dark Tech humor」（誤標）。事後想用 `/portfolio/images/<id>/edit` 頁面手動改成正確 collection 再按 `#submit-work` 送出，checkbox 當下有勾對、但重新整理頁面後又跳回「Dark Tech humor」——`#submit-work` 送出似乎不會真的儲存 collection 欄位，Redbubble 的編輯頁存 collection 可能是另一套獨立機制（可能是 checkbox onChange 直接觸發 AJAX，但點擊沒觸發到，或需要別的儲存按鈕），還沒找到正確存法。目前建議使用者手動上網站改，這兩個商品的分類還是錯的（其他都正常）。
+
 ## 目前狀態（2026-08-19）
 修好 `pinterest_trends_check.py` 跟 `quote_weekly.py` 共用的一個 bug：兩支都用 `subprocess.run(["claude", "-p", ...])` 呼叫獨立 claude 子行程，但 crontab 環境 PATH 很陽春，找不到 `claude`（`FileNotFoundError: [Errno 2] No such file or directory: 'claude'`），08-19 早上 08:30 的趨勢排程因此沒送出。改成寫死絕對路徑 `/home/tses89214/.local/bin/claude`，用 `env -i` 模擬陽春 PATH 測過會過。手動補跑當天的趨勢點子成功送出。順便把 `quote_weekly.py` 排程從每週一改成每天 10:00（使用者要求）。
 
