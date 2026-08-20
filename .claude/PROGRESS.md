@@ -1,5 +1,18 @@
 # PROGRESS
 
+## 目前狀態（2026-08-20）
+延續 2026-08-19「3,4,6,7,9」點子批次跑完最後一批 `/meme` 全流程，其中「Please Restart Monday and Try Again」被使用者取消（"這個不要了"），其餘全發：
+
+1. It's Not a Bug, It's an Undocumented Feature（font caveat, collection Dark Tech humor）
+2. Sweat Now, Shine Later（font caveat, collection Train Hard. Repeat.）：白 https://www.redbubble.com/shop/ap/183154201 / 黑 https://www.redbubble.com/shop/ap/183154390
+3. low Battery need coffee to recharge（font huninn, collection Life.exe Has Stopped Working）：白 https://www.redbubble.com/shop/ap/183154914 / 黑 https://www.redbubble.com/shop/ap/183155186
+4. Not late just in my own time zone（font caveat, collection Life.exe Has Stopped Working）：白 https://www.redbubble.com/shop/ap/183155700 / 黑 https://www.redbubble.com/shop/ap/183155937
+5. I paused my game to be here（font oswald, collection Life.exe Has Stopped Working）：白 https://www.redbubble.com/shop/ap/183156333 / 黑 https://www.redbubble.com/shop/ap/183156556
+
+全站累計 115 個設計（`upload_metadata.json`）。
+
+**新踩雷**：第一個 publish（Sweat Now）連續兩次失敗在 `get_driver()`，Selenium 拋 `SessionNotCreatedException: cannot connect to chrome`。第一次以為是舊 session 殘留的 `.rb_chrome_profile/SingletonLock` 檔卡住，清掉重跑還是失敗；真正原因是這次互動式 shell 沒繼承 `DISPLAY` 環境變數（`rb_upload.py` 的 `get_driver()` 用 `headless=False`，需要真的連上 X），`echo $DISPLAY` 是空的。補上 `DISPLAY=:0 XDG_RUNTIME_DIR=/run/user/1000` 前綴後正常啟動 Chrome。之後手動在互動 shell 跑 `publish_design.py` 都要記得帶這兩個環境變數（crontab 排程的 `pinterest_upload.py daily` 那條已經有帶，只有手動跑 `/meme` 流程時容易漏）。
+
 ## 目前狀態（2026-08-19，續）
 Pinterest 趨勢點子（Battery 1%/Attitude 100%、My only paparazzi is my dog）走完 `/meme` 全流程：
 - Battery 1% Attitude 100%（font anton, collection Life.exe Has Stopped Working）：白 https://www.redbubble.com/shop/ap/183119136 / 黑 https://www.redbubble.com/shop/ap/183119344，Pinterest 成功
