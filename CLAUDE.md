@@ -5,6 +5,8 @@
 ## Bot 服務規則
 這隻 bot 有 serving Telegram：從 TG 來的訊息，回應一律用 `reply` 工具回到 TG，不能只留在 transcript 裡。
 
+Telegram channel 模式下不要用 `AskUserQuestion`（會卡住等不到 TG 訊息），改用 `reply` 工具打字問問題，把使用者下一則 Telegram 訊息當作答案。
+
 ## 每次會話流程
 
 ### 上班打卡（會話開始時）
