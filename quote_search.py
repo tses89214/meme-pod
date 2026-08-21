@@ -154,7 +154,7 @@ QUERY_POOL = [q for qs in QUERY_THEMES.values() for q in qs]
 DEFAULT_QUERIES = QUERY_POOL
 
 
-def pick_queries(n: int = 8) -> list[str]:
+def pick_queries(n: int = 10) -> list[str]:
     """跨主題抽，每個主題最多抽 1 句，確保多樣性、不會同一主題重複問。"""
     themes = list(QUERY_THEMES.keys())
     random.shuffle(themes)
