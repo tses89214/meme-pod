@@ -47,9 +47,13 @@ QUERY_THEMES = {
         "short dad jokes puns funny for t-shirts",
         "site:reddit.com r/dadjokes short funny puns",
     ],
-    "Paw Prints & Puns / pets": [
-        "short funny pet owner dog cat puns quotes for t-shirts",
-        "site:reddit.com funny dog cat owner puns short",
+    "Paw Prints & Puns / 狗奴": [
+        "short funny dog owner puns quotes for t-shirts",
+        "site:reddit.com funny dog owner puns short",
+    ],
+    "貓奴": [
+        "short funny cat owner puns quotes for t-shirts",
+        "site:reddit.com funny cat owner puns short",
     ],
     "上班族/辦公室": [
         "short witty office work humor quotes",
@@ -74,6 +78,74 @@ QUERY_THEMES = {
     "正向/勵志": [
         "short positive motivational one-liner quotes for t-shirts",
         "underrated inspirational quotes short forum discussion",
+    ],
+    "學生/考試壓力": [
+        "short funny student exam stress quotes",
+        "site:reddit.com funny short quotes about school exams",
+    ],
+    "會計/報稅/理財": [
+        "short funny quotes about taxes and money struggles",
+        "site:reddit.com r/personalfinance funny short quotes about being broke",
+    ],
+    "酒精/派對": [
+        "short funny drinking party quotes for t-shirts",
+        "site:reddit.com funny short quotes about wine or tequila",
+    ],
+    "星座/占星": [
+        "short funny zodiac sign quotes",
+        "site:reddit.com r/astrology funny short quotes",
+    ],
+    "手足/兄弟姊妹": [
+        "short funny sibling quotes for t-shirts",
+        "site:reddit.com funny short quotes about siblings",
+    ],
+    "婚姻/夫妻": [
+        "short funny marriage husband wife quotes",
+        "site:reddit.com funny short married life quotes",
+    ],
+    "單身": [
+        "short funny single life quotes for t-shirts",
+        "site:reddit.com funny short quotes about being single",
+    ],
+    "老師/教育界": [
+        "short funny teacher life quotes for t-shirts",
+        "site:reddit.com r/Teachers funny short quotes",
+    ],
+    "護理師/醫護": [
+        "short funny nurse healthcare worker quotes",
+        "site:reddit.com r/nursing funny short quotes",
+    ],
+    "書呆子/讀書狂": [
+        "short funny bookworm reader quotes for t-shirts",
+        "site:reddit.com r/books funny short quotes",
+    ],
+    "植物系/園藝": [
+        "short funny plant lady gardening quotes",
+        "site:reddit.com r/houseplants funny short quotes",
+    ],
+    "露營/戶外": [
+        "short funny camping hiking outdoor quotes",
+        "site:reddit.com r/camping funny short quotes",
+    ],
+    "追劇/電影迷": [
+        "short funny binge watching tv show quotes",
+        "site:reddit.com funny short quotes about watching movies",
+    ],
+    "手搖飲/甜點控": [
+        "short funny bubble tea dessert lover quotes",
+        "site:reddit.com funny short quotes about boba or sweets addiction",
+    ],
+    "車主/機車迷": [
+        "short funny car motorcycle enthusiast quotes",
+        "site:reddit.com r/cars funny short quotes",
+    ],
+    "新手爸媽": [
+        "short funny new parent quotes for t-shirts",
+        "site:reddit.com r/Parenting funny short quotes",
+    ],
+    "退休/長輩": [
+        "short funny retirement grandpa grandma quotes",
+        "site:reddit.com funny short quotes about being retired",
     ],
 }
 
