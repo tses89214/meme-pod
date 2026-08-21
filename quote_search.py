@@ -20,34 +20,73 @@ from pathlib import Path
 BASE_DIR = Path(__file__).parent
 ENV_FILE = BASE_DIR / ".env"
 
-QUERY_POOL = [
-    "short savage sarcastic one-liner quotes for t-shirts",
-    "short funny quirky english quotes for t-shirts",
-    "short positive motivational one-liner quotes for t-shirts",
-    "funny self-deprecating relatable quotes short",
-    "creative witty roast insult comebacks short and clever not vulgar",
-    "short dad jokes puns funny for t-shirts",
-    "short funny pet owner dog cat puns quotes for t-shirts",
-    "site:reddit.com funniest short one-liners people say",
-    "site:reddit.com r/ShowerThoughts funny short quotes",
-    "site:reddit.com AskReddit funniest comeback lines short",
-    "best short quotes this week trending",
-    "underrated funny quotes short forum discussion",
-    "short witty office work humor quotes",
-    "short gym fitness motivational sarcastic quotes",
-    "short introvert relatable funny quotes",
-    "short coffee tired sarcastic quotes",
-]
+# 依現有 7 個 Redbubble collection ＋ 客群輪廓分類，每類都給搜尋跟論壇來源兩種
+# query，pick_queries() 會跨類別抽，比單一大池子隨機抽更不容易同類題材抽到重複。
+QUERY_THEMES = {
+    "漢字/Bilingual": [
+        "funny chinese english bilingual pun quotes short",
+        "site:reddit.com funny chinese english wordplay jokes",
+    ],
+    "Adult Class System / adulting": [
+        "short funny adulting struggles quotes",
+        "site:reddit.com adulting is hard funny quotes",
+    ],
+    "Life.exe Has Stopped Working / tech-life crash": [
+        "funny brain.exe crashed life glitch quotes short",
+        "site:reddit.com funny short quotes about burnout tired life",
+    ],
+    "Train Hard. Repeat. / gym": [
+        "short gym fitness motivational sarcastic quotes",
+        "site:reddit.com r/gym funny short motivational quotes",
+    ],
+    "Dark Tech humor / programmer": [
+        "short programmer developer tech humor quotes",
+        "site:reddit.com r/ProgrammerHumor short funny quotes",
+    ],
+    "Dad Jokes": [
+        "short dad jokes puns funny for t-shirts",
+        "site:reddit.com r/dadjokes short funny puns",
+    ],
+    "Paw Prints & Puns / pets": [
+        "short funny pet owner dog cat puns quotes for t-shirts",
+        "site:reddit.com funny dog cat owner puns short",
+    ],
+    "上班族/辦公室": [
+        "short witty office work humor quotes",
+        "site:reddit.com r/antiwork funny short quotes",
+    ],
+    "自嘲/毒舌通用": [
+        "short savage sarcastic one-liner quotes for t-shirts",
+        "creative witty roast insult comebacks short and clever not vulgar",
+    ],
+    "咖啡/沒睡飽": [
+        "short coffee tired sarcastic quotes",
+        "site:reddit.com funny short quotes about needing coffee",
+    ],
+    "遊戲玩家": [
+        "short funny gamer quotes one-liner",
+        "site:reddit.com r/gaming funny short quotes",
+    ],
+    "內向/社恐": [
+        "short introvert relatable funny quotes",
+        "site:reddit.com introvert funny short quotes",
+    ],
+    "正向/勵志": [
+        "short positive motivational one-liner quotes for t-shirts",
+        "underrated inspirational quotes short forum discussion",
+    ],
+}
 
-# 每次跑隨機挑幾組（含至少 1 個論壇來源），比固定同一組不容易一直重複
+# 舊名保留給其他程式相容用（例如手動 `python quote_search.py` 不帶參數時）
+QUERY_POOL = [q for qs in QUERY_THEMES.values() for q in qs]
 DEFAULT_QUERIES = QUERY_POOL
 
 
-def pick_queries(n: int = 6) -> list[str]:
-    forum_queries = [q for q in QUERY_POOL if "reddit" in q or "forum" in q]
-    others = [q for q in QUERY_POOL if q not in forum_queries]
-    picks = random.sample(forum_queries, min(2, len(forum_queries)))
-    picks += random.sample(others, min(n - len(picks), len(others)))
+def pick_queries(n: int = 8) -> list[str]:
+    """跨主題抽，每個主題最多抽 1 句，確保多樣性、不會同一主題重複問。"""
+    themes = list(QUERY_THEMES.keys())
+    random.shuffle(themes)
+    picks = [random.choice(QUERY_THEMES[t]) for t in themes[:n]]
     random.shuffle(picks)
     return picks
 
