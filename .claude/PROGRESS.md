@@ -1,5 +1,20 @@
 # PROGRESS
 
+## 目前狀態（2026-08-21）
+使用者反映本週語錄搜尋一直重複，根因：`quote_weekly.py` 每天固定用同一組 7 個關鍵字問 Tavily，來源太窄。改法：`quote_search.py` 的關鍵字改成依 31 個客群/collection 主題分類（對照 7 個 Redbubble collection + 學生、報稅理財、派對飲酒、星座、手足、婚姻、單身、老師、護理師、書呆子、園藝、露營、追劇、手搖飲、車主、新手爸媽、退休長輩等 18 個新客群輪廓），每主題配「一般搜尋」+「site:reddit.com 論壇來源」各一句、共 62 條 query，`pick_queries()` 改成跨主題抽（每主題最多 1 句），每次跑抽 10 個主題。手動測試跑過一次，8 句語錄涵蓋手搖飲/園藝/內向/健身/咖啡等不同主題、沒有重複。
+
+跑完使用者從測試語錄挑的 4 個新設計，全部走完 `/meme` 全流程：
+1. SWEAT is your fat crying（font caveat, collection Train Hard. Repeat.）：白 https://www.redbubble.com/shop/ap/183176981 / 黑 https://www.redbubble.com/shop/ap/183177155
+2. TAPIOCA LOOP asked for boba now I'm stuck here forever（font caveat, collection Adult Class System）：白 https://www.redbubble.com/shop/ap/183177849 / 黑 https://www.redbubble.com/shop/ap/183177569
+3. QUIET PEOPLE have the loudest minds（font fredoka, collection Adult Class System）：白 https://www.redbubble.com/shop/ap/183178087 / 黑 https://www.redbubble.com/shop/ap/183178202
+4. DO NOTHING you don't need a million dollars look at my cousin（font fredoka, collection Life.exe Has Stopped Working）：白 https://www.redbubble.com/shop/ap/183178755 / 黑 https://www.redbubble.com/shop/ap/183178909
+
+全站累計 119 個設計。
+
+**新踩雷**：TAPIOCA LOOP 的 white_template 送出後，`fill_design()` 沒偵測到商品網址（回傳 None），我一開始被 `_rb_preview.png` 截圖誤導以為已經發布成功——實際上 white_template 和 black_template 兩個 variant 共用同一個截圖檔案路徑，我看到的「Congratulations 已發布」畫面其實是後面 black_template 步驟蓋過去的截圖，不是 white_template 當下的狀態。用 `manage_works` 頁面清點才發現這個設計只建立了 1 個 work（不是正常的 2 個），代表 white_template 那次送出真的失敗（不是 URL 偵測誤判）。手動重跑 `fill_design()` 補上後就正常抓到網址、成功建立。同一批 QUIET PEOPLE 的 Pinterest pin 也第一次沒過（無 traceback，`fill_and_publish_pin` 靜默回傳 False），手動重跑 `publish_design.publish_pinterest()` 就過了。這兩個都像是 Redbubble/Pinterest 那端偶發的頁面延遲/loading race condition，不是程式邏輯錯誤，重跑（不是改代碼）就解決了。**以後看到 `publish_design.py` 某個 variant 回傳 None 或 Pinterest 失敗，先用 `manage_works` 頁面或直接看商品頁確認實際有沒有建立/需要重試，不要單看 `_rb_preview.png`（那張圖是兩個 variant 共用的暫存檔，會被後面步驟覆蓋，不能拿來判斷「這一步」到底有沒有成功）。**
+
+補一條 CLAUDE.md 規則：Telegram channel 模式下不要用 `AskUserQuestion`（會卡住等不到 TG 訊息），改用 `reply` 工具打字問、把下一則 Telegram 訊息當答案。
+
 ## 目前狀態（2026-08-20）
 延續 2026-08-19「3,4,6,7,9」點子批次跑完最後一批 `/meme` 全流程，其中「Please Restart Monday and Try Again」被使用者取消（"這個不要了"），其餘全發：
 
