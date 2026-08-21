@@ -11,6 +11,7 @@ quote_search.py — 用 Tavily 搜短句語錄候選（給梗圖 T 恤選題材�
   python quote_search.py "自訂關鍵字" "另一個關鍵字"
 """
 
+import random
 import sys
 import json
 import urllib.request
@@ -19,7 +20,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).parent
 ENV_FILE = BASE_DIR / ".env"
 
-DEFAULT_QUERIES = [
+QUERY_POOL = [
     "short savage sarcastic one-liner quotes for t-shirts",
     "short funny quirky english quotes for t-shirts",
     "short positive motivational one-liner quotes for t-shirts",
@@ -27,7 +28,28 @@ DEFAULT_QUERIES = [
     "creative witty roast insult comebacks short and clever not vulgar",
     "short dad jokes puns funny for t-shirts",
     "short funny pet owner dog cat puns quotes for t-shirts",
+    "site:reddit.com funniest short one-liners people say",
+    "site:reddit.com r/ShowerThoughts funny short quotes",
+    "site:reddit.com AskReddit funniest comeback lines short",
+    "best short quotes this week trending",
+    "underrated funny quotes short forum discussion",
+    "short witty office work humor quotes",
+    "short gym fitness motivational sarcastic quotes",
+    "short introvert relatable funny quotes",
+    "short coffee tired sarcastic quotes",
 ]
+
+# 每次跑隨機挑幾組（含至少 1 個論壇來源），比固定同一組不容易一直重複
+DEFAULT_QUERIES = QUERY_POOL
+
+
+def pick_queries(n: int = 6) -> list[str]:
+    forum_queries = [q for q in QUERY_POOL if "reddit" in q or "forum" in q]
+    others = [q for q in QUERY_POOL if q not in forum_queries]
+    picks = random.sample(forum_queries, min(2, len(forum_queries)))
+    picks += random.sample(others, min(n - len(picks), len(others)))
+    random.shuffle(picks)
+    return picks
 
 
 def load_api_key() -> str:
@@ -56,7 +78,7 @@ def search_quotes(query: str, api_key: str) -> str:
 
 
 def main():
-    queries = sys.argv[1:] or DEFAULT_QUERIES
+    queries = sys.argv[1:] or pick_queries()
     api_key = load_api_key()
     for q in queries:
         print(f"=== {q} ===")

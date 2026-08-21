@@ -67,7 +67,7 @@ def main():
     import quote_search
     api_key = quote_search.load_api_key()
     parts = []
-    for q in quote_search.DEFAULT_QUERIES:
+    for q in quote_search.pick_queries():
         parts.append(f"=== {q} ===\n{quote_search.search_quotes(q, api_key)}")
     candidates = "\n\n".join(parts)
 
