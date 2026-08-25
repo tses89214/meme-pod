@@ -1,5 +1,12 @@
 # PROGRESS
 
+## 目前狀態（2026-08-25，續）
+補發 2 個設計，走完 `/meme` 全流程（Redbubble 黑白版 + Pinterest）：
+1. I'm The Reason We're Always Out Of Beer（font oswald, collection Adult Class System）：白 https://www.redbubble.com/shop/ap/183299009 / 黑 https://www.redbubble.com/shop/ap/183299163
+2. Without Coffee I'm Just A Depresso（font genyogot, collection Life.exe Has Stopped Working）：白 https://www.redbubble.com/shop/ap/183299372 / 黑 https://www.redbubble.com/shop/ap/183299541
+
+全站累計 121 個設計。Google Drive 備份仍是舊 token 過期問題（`invalid_grant`），跳過未跑，需要使用者重新走 OAuth（同下面「下一步」第 5 點，還沒處理）。
+
 ## 目前狀態（2026-08-21）
 使用者反映本週語錄搜尋一直重複，根因：`quote_weekly.py` 每天固定用同一組 7 個關鍵字問 Tavily，來源太窄。改法：`quote_search.py` 的關鍵字改成依 31 個客群/collection 主題分類（對照 7 個 Redbubble collection + 學生、報稅理財、派對飲酒、星座、手足、婚姻、單身、老師、護理師、書呆子、園藝、露營、追劇、手搖飲、車主、新手爸媽、退休長輩等 18 個新客群輪廓），每主題配「一般搜尋」+「site:reddit.com 論壇來源」各一句、共 62 條 query，`pick_queries()` 改成跨主題抽（每主題最多 1 句），每次跑抽 10 個主題。手動測試跑過一次，8 句語錄涵蓋手搖飲/園藝/內向/健身/咖啡等不同主題、沒有重複。
 
