@@ -1,5 +1,16 @@
 # PROGRESS
 
+## 目前狀態（2026-08-26）
+每週語錄搜尋結果 8 句送出後，使用者挑第 8 句「My cat/dog runs the house, I just pay the bills」做貓狗兩版，走完 `/meme` 全流程：
+1. My Cat Runs The House I Just Pay The Bills（font oswald, collection Paw Prints & Puns）：白 https://www.redbubble.com/shop/ap/183307165 / 黑 https://www.redbubble.com/shop/ap/183307467
+2. My Dog Runs The House I Just Pay The Bills（font oswald, collection Paw Prints & Puns）：白 https://www.redbubble.com/shop/ap/183307822 / 黑 https://www.redbubble.com/shop/ap/183308213
+
+全站累計 123 個設計。
+
+**新踩雷**：貓版第一次 `publish_design.py` 送出時撞到 `SessionNotCreatedException`（連不上 chrome），原因是同一時間 10:00 排程的 `pinterest_explore_like.py` 正在跑，跟手動發布搶同一份 `.rb_chrome_profile`（跟 08-15 那次記錄的失敗模式一樣）。等排程跑完（`ps aux` 確認 `pinterest_explore_like.py` process 已結束）再重跑就正常。**教訓重申：手動 publish 前先用 `ps aux | grep -E 'rb_explore_like|pinterest_explore_like'` 確認排程沒在跑，不要看到 SessionNotCreatedException 就急著 kill chrome process ——先查是不是排程佔用中。**
+
+另外這次連續發兩個設計（貓版、狗版）用了 skill 文件裡建議的正確順序：先把貓版渲染完成、字型/collection都問好，立刻重新render+publish貓版；貓版publish送出去之後（此時已經讀完圖片路徑，不受後續render覆蓋影響）才開始跑狗版的字型預覽渲染，狗版render完成後再重新render+publish（因為`.last_meme_session.json`一次只能存一份）。過程中有先用`python3 -c "...last_meme_session.json..."`確認session裡的text是哪個設計，再送出publish，避免文字不匹配的RuntimeError（跟今天稍早OUT OF BEER第一次失敗一樣的錯）。
+
 ## 目前狀態（2026-08-25，續）
 補發 2 個設計，走完 `/meme` 全流程（Redbubble 黑白版 + Pinterest）：
 1. I'm The Reason We're Always Out Of Beer（font oswald, collection Adult Class System）：白 https://www.redbubble.com/shop/ap/183299009 / 黑 https://www.redbubble.com/shop/ap/183299163
