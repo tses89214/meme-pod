@@ -67,7 +67,7 @@ def try_autoreply(from_bot: str, message: str) -> str | None:
     prompt = CLASSIFY_PROMPT.format(context=PROJECT_CONTEXT, message=message)
     result = subprocess.run(
         [
-            "claude", "-p", prompt,
+            str(Path.home() / ".local/bin/claude"), "-p", prompt,
             "--strict-mcp-config", "--mcp-config", '{"mcpServers":{}}',
             "--dangerously-skip-permissions",
         ],
