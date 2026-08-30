@@ -1,5 +1,11 @@
 # PROGRESS
 
+## 目前狀態（2026-08-30）
+`pinterest_trends_check.py` 每日趨勢點子挑了第 5 個（USA football / white out football game outfit）走完 `/meme` 全流程：
+1. I'm Here For The Snacks Not The Score（font caveat, collection Adult Class System）：白 https://www.redbubble.com/shop/ap/183426998 / 黑 https://www.redbubble.com/shop/ap/183427585，Pinterest 成功
+
+全站累計 127 個設計。Google Drive 備份仍是舊 token 過期問題（`invalid_grant`），跳過未跑（同下面「下一步」第 5 點，還沒處理）。
+
 ## 目前狀態（2026-08-26）
 每週語錄搜尋結果 8 句送出後，使用者挑第 8 句「My cat/dog runs the house, I just pay the bills」做貓狗兩版，走完 `/meme` 全流程：
 1. My Cat Runs The House I Just Pay The Bills（font oswald, collection Paw Prints & Puns）：白 https://www.redbubble.com/shop/ap/183307165 / 黑 https://www.redbubble.com/shop/ap/183307467

@@ -13771,5 +13771,74 @@
     "redbubble_url": "https://www.redbubble.com/shop/ap/183307822",
     "collection": "Paw Prints & Puns",
     "pinned": true
+  },
+  {
+    "text": "I'M HERE FOR THE SNACKS, NOT THE SCORE",
+    "font": "CAVEAT",
+    "title": "I'm Here For The Snacks Not The Score Funny Football Tee",
+    "description": "Kickoff is just the appetizer round. Here for the dip, not the down.",
+    "tags": [
+      "football",
+      "tailgate",
+      "snacks",
+      "funny",
+      "sarcastic",
+      "game day",
+      "sports fan",
+      "gift",
+      "food lover",
+      "meme"
+    ],
+    "translations": {
+      "en": {
+        "title": "I'm Here For The Snacks Not The Score Funny Football Tee",
+        "main_tag": "tailgate humor",
+        "tags": [
+          "football",
+          "tailgate",
+          "snacks",
+          "funny",
+          "gift"
+        ],
+        "description": "Kickoff is just the appetizer round. Here for the dip, not the down."
+      },
+      "de": {
+        "title": "Ich Bin Wegen Der Snacks Hier Nicht Wegen Des Spiels Lustiges Shirt",
+        "main_tag": "Football Humor",
+        "tags": [
+          "Football",
+          "Snacks",
+          "lustig",
+          "Geschenk"
+        ],
+        "description": "Anstoß ist nur die Vorspeisenrunde. Hier für den Dip, nicht den Punktestand."
+      },
+      "fr": {
+        "title": "Je Suis Là Pour Les Snacks Pas Pour Le Score T-shirt Drôle",
+        "main_tag": "humour football",
+        "tags": [
+          "football",
+          "snacks",
+          "drôle",
+          "cadeau"
+        ],
+        "description": "Le coup d'envoi n'est que l'entrée. Je suis là pour la sauce, pas le score."
+      },
+      "es": {
+        "title": "Estoy Aquí Por Los Snacks No Por El Marcador Camiseta Graciosa",
+        "main_tag": "humor fútbol americano",
+        "tags": [
+          "fútbol americano",
+          "snacks",
+          "gracioso",
+          "regalo"
+        ],
+        "description": "El saque inicial es solo el aperitivo. Aquí por la salsa, no por el marcador."
+      }
+    },
+    "uploaded": true,
+    "redbubble_url": "https://www.redbubble.com/shop/ap/183426998",
+    "collection": "Adult Class System",
+    "pinned": true
   }
 ]
