@@ -1,5 +1,18 @@
 # PROGRESS
 
+## 目前狀態（2026-09-02）
+語錄/趨勢批次的 4 個新設計走完 `/meme` 全流程（Redbubble 黑白版 + Pinterest，4/4 全部成功）：
+1. Snack First Summit Second（font genyogot, collection 預設 Dark Tech humor）：白 https://www.redbubble.com/shop/ap/183498805 / 黑 https://www.redbubble.com/shop/ap/183499015
+2. Body Says No Soul Says Yes Knees Say Absolutely Not（font huninn, collection Adult Class System）：白 https://www.redbubble.com/shop/ap/183498258 / 黑 https://www.redbubble.com/shop/ap/183498518
+3. My Greatest Skill Turning Coffee Into Resignation Letters（font genyomin, collection 預設 Dark Tech humor）：白 https://www.redbubble.com/shop/ap/183499392 / 黑 https://www.redbubble.com/shop/ap/183499711
+4. I Hike So I Can Eat More（font oswald, collection Dad Jokes）：白 https://www.redbubble.com/shop/ap/183500201 / 黑 https://www.redbubble.com/shop/ap/183500574
+
+全站累計 131 個設計。
+
+**新踩雷**：這批字型/collection 是使用者在上一個 session 選定的，但過程中 pi-admin watchdog 因為 Telegram MCP subprocess 靜默死掉（upstream issue #1680）重啟了 bot 兩次（12:45、12:55），新 session 完全接不到舊 session 的記憶——`.last_meme_session.json` 只留著最後一個正在跑的設計（Body Says No），另外 3 個只剩 `output/` 裡的字型預覽圖檔，沒有任何文字記錄選了哪個字型/collection。使用者事後把整段舊對話文字貼過來才補齊。**教訓：`.last_meme_session.json` 和對話記憶都不能扛跨 session 中斷，之後如果收到「怎麼了」「你有上傳跑到一半」這類問句，先查 `ps aux`、`.last_meme_session.json`、`output/` 裡今天的檔案、`upload_metadata.json` 有沒有這筆，而不是假設對話有連續性。**
+
+另外重啟前使用者留了一筆未 commit 的草稿 metadata（books/reading 主題「I Like Big Books And I Cannot Lie」），確認後使用者要求刪掉，已用 `git checkout` 還原乾淨（純新增沒有其他改動，安全丟棄）。
+
 ## 目前狀態（2026-08-30）
 `pinterest_trends_check.py` 每日趨勢點子挑了第 5 個（USA football / white out football game outfit）走完 `/meme` 全流程：
 1. I'm Here For The Snacks Not The Score（font caveat, collection Adult Class System）：白 https://www.redbubble.com/shop/ap/183426998 / 黑 https://www.redbubble.com/shop/ap/183427585，Pinterest 成功
