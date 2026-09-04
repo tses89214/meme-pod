@@ -192,3 +192,16 @@ Pinterest board 那邊使用者要求一起建：pin-builder 頁面的 board 下
 發「漢字 / Bilingual」collection 5 個設計時，滷肉飯那筆白底範本正常拿到商品網址，黑底範本 `rb_upload.py` 的 duplicate 頁面網址解析失敗、`fill_design()` 回傳 `None`，但整支 `publish_design.py` process 照樣以 exit code 0 結束，`=== 完成 ===` 那行也照樣印出來，只是黑底那欄的值是 `None`。Pinterest 那步也正常成功（吃的是白底的網址）。
 之前只遇過「整支失敗」或「整支成功」，第一次遇到這種半途失敗但外層看起來完成的情況。
 結論：**以後每次 publish 完，一定要實際打開 wait-loop 輸出檔案核對白底跟黑底兩個商品網址是不是都拿到了，不能只看 exit code 或「完成」字樣**（fail loud 原則，見 CLAUDE.md Rule 12）。這筆滷肉飯黑底已回報使用者，等回覆決定要不要重跑，尚未修。
+
+## 2026-09-04 — Cloudflare 上傳頁卡住的真正根因：樹莓派資源競爭，不是等待時間不夠
+舊會話曾得出「Cloudflare 驗證頁 1-5 分鐘會自動過，不用手動點」的結論，這次重測直接失效（150 秒、300 秒都卡住）。截圖證實驗證頁本身顯示「Verifying... Stuck? Troubleshoot」——不是還在算，是 Cloudflare 自己判定卡死了。
+查 `uptime`/`ps aux --sort=-%cpu` 抓到主因：4 個 freqtrade dryrun bot 常駐（各吃 40-70% CPU）+ 多個 claude session 同時開著，樹莓派只有 4 核心，load average 常態飄在 9-14。「先跳 dashboard 熱身再跳上傳頁」這個嘗試沒用——因為 Chrome 自己啟動（GPU process + renderer）本身就會把負載再往上推，變成負載越高、Chrome 越慢、越容易卡在驗證頁的循環。
+**修法（`rb_upload.py` 的 `get_driver()`）**：加了幾個只降低 Chrome 自身資源佔用、不影響 Cloudflare 指紋判斷的參數：`--renderer-process-limit=1`、`--disable-background-networking`、`--disable-sync`、`--disable-default-apps`、`--disable-client-side-phishing-detection`、`--disable-component-update`、`--disable-domain-reliability`、`--metrics-recording-only`、`--mute-audio`。加了之後在 load 6-8 左右能穩定過驗證（仍要等 200-260 秒屬正常，不是還在卡）。
+**結論**：這台機器的「等多久算卡住」沒有固定答案，取決於當下系統負載。**以後如果又卡在驗證頁，先查負載再判斷，不要套用任何一次觀察到的固定秒數當標準**——這條也適用於未來任何一次「上次結論現在不成立」的狀況：先重新驗證現況，不要預設舊結論還有效（誠實回報現況比套用舊記憶更重要）。
+
+## 2026-09-04 — `publish_design.py` 第三個參數（collection）是純字串，不是 JSON
+meme.md 文件裡的用法範例寫成 `python publish_design.py "<text>" <font> ["<collection name>"]`，中括號容易被誤讀成「這裡要傳 JSON 陣列」，但程式碼（`sys.argv[3]`）其實直接把它當一般字串比對，不解析 JSON。誤傳成 `["Life.exe Has Stopped Working"]`（含字面上的中括號引號）會連環炸兩個地方：
+1. `rb_upload.py` 的 `select_collection()` 找不到叫這個名字的 collection，略過勾選（Redbubble 商品的 collection 分類不會套用）。
+2. 這個壞字串也存進 `upload_metadata.json` 的 `collection` 欄位，`pinterest_upload.py` 的 `fill_and_publish_pin()` 裡 `board = board or meta.get("collection") or BOARD_NAME` 會拿它去組 CSS selector `[data-test-id="board-row-{board}"]`，中括號引號讓 selector 語法本身不合法，丟出 `InvalidSelectorException`——這不是 `NoSuchElementException`，既有的「找不到 board 就退回預設 board」容錯接不住，整支 `publish_design.py` 直接 crash，Pinterest 完全沒發成。
+**結論：呼叫 `publish_design.py` 時第三個參數只填 collection 的純名稱字串（例如 `"Dark Tech humor"`），不要加中括號或引號。** meme.md 的範例語法之後如果有機會應該一併澄清，避免下次又照字面抄。
+事後補救：修正 metadata 裡的 `collection` 欄位為乾淨字串後，用 `publish_pinterest()` 單獨重跑補發成功。Redbubble 商品的 collection 分類本身沒有補救（已發布商品的編輯頁勾選不會真的存檔，是更早就記錄過的已知限制，見 PROGRESS.md），使用者確認這兩筆不用管了。

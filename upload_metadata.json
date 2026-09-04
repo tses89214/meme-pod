@@ -14116,5 +14116,85 @@
     "collection": "Dad Jokes",
     "redbubble_url": "https://www.redbubble.com/shop/ap/183500201",
     "pinned": true
+  },
+  {
+    "text": "ME AT 3 PM /n *1% BATTERY* /n NO CHARGER",
+    "font": "CAVEAT",
+    "title": "Me At 3 PM 1% Battery No Charger Funny T-Shirt",
+    "description": "The afternoon energy crash, illustrated. For anyone running on fumes by mid-day with zero backup plan. Funny low-battery text design perfect for tired people everywhere.",
+    "tags": [
+      "funny",
+      "meme",
+      "tired",
+      "low energy",
+      "sarcastic",
+      "relatable",
+      "gift",
+      "quote",
+      "office humor",
+      "work humor",
+      "afternoon slump",
+      "burnout",
+      "trending",
+      "viral",
+      "self deprecating"
+    ],
+    "translations": {
+      "en": {
+        "title": "Me At 3 PM 1% Battery No Charger Funny T-Shirt",
+        "main_tag": "tired humor",
+        "tags": [
+          "funny",
+          "meme",
+          "tired",
+          "low energy",
+          "sarcastic",
+          "relatable",
+          "gift",
+          "afternoon slump"
+        ],
+        "description": "The afternoon energy crash, illustrated. For anyone running on fumes by mid-day with zero backup plan."
+      },
+      "de": {
+        "title": "Ich Um 15 Uhr 1% Akku Kein Ladegerät Lustiges T-Shirt",
+        "main_tag": "Müdigkeitshumor",
+        "tags": [
+          "müde",
+          "lustig",
+          "erschöpft",
+          "sarkastisch",
+          "Geschenk"
+        ],
+        "description": "Der Nachmittagstief, illustriert. Für alle, die mitten am Tag auf dem letzten Loch pfeifen, ohne Ersatzplan."
+      },
+      "fr": {
+        "title": "Moi À 15h 1% Batterie Pas De Chargeur T-shirt Drôle",
+        "main_tag": "humour de fatigue",
+        "tags": [
+          "fatigué",
+          "drôle",
+          "épuisé",
+          "sarcastique",
+          "cadeau"
+        ],
+        "description": "Le coup de barre de l'après-midi, illustré. Pour tous ceux qui tiennent sur la réserve en milieu de journée, sans plan B."
+      },
+      "es": {
+        "title": "Yo A Las 3 PM 1% Batería Sin Cargador Camiseta Graciosa",
+        "main_tag": "humor de cansancio",
+        "tags": [
+          "cansado",
+          "gracioso",
+          "agotado",
+          "sarcástico",
+          "regalo"
+        ],
+        "description": "El bajón de energía de la tarde, ilustrado. Para quienes van con la batería al mínimo a mitad de día, sin plan de reserva."
+      }
+    },
+    "uploaded": true,
+    "redbubble_url": "https://www.redbubble.com/shop/ap/183549729",
+    "collection": "Life.exe Has Stopped Working",
+    "pinned": true
   }
 ]

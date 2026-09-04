@@ -187,3 +187,16 @@ Redbubble + Pinterest 全自動管線穩定運作中。目前 79 個設計，全
 5. Google Drive 備份 token 過期（`drive_upload.py batch` 2026-08-07 起失敗，`invalid_grant: Token has been expired or revoked`），需要重新走一次 OAuth 授權流程才能繼續備份，這段期間累積的設計圖都還沒備份到 Drive。
 6. `bot_mailbox_check.py` 2026-08-07 改成會用隔離的 `claude -p` 自動回覆純資訊性 mailbox 訊息（規則見 `~/.claude/bot-mailbox/README.md`），還沒實際收過一次別的 bot 主動問問題來驗證這條路徑真的有效。
 7. `upload_metadata.json` 已 commit 乾淨，84 筆全部同步。
+
+## 2026-09-04 — Pinterest Trends 新設計（低電量梗）+ Chrome 卡驗證頁根因找到 + collection 參數格式踩雷
+發布「ME AT 3 PM /n *1% BATTERY* /n NO CHARGER」（Life.exe Has Stopped Working collection，caveat 字型），全站累計 132 個設計。
+
+**Cloudflare 驗證頁卡住根因＝樹莓派資源競爭**：這次重現舊會話「1-5 分鐘會自動過」失效的狀況，診斷發現不是等待時間不夠，是 Cloudflare 驗證頁本身顯示「Verifying... Stuck? Troubleshoot」（截圖證實），跟同時跑的 4 個 freqtrade dryrun bot（各吃 40-70% CPU）+ 多個 claude session 疊加，load average 衝到 9-14（機器只有 4 核心）有關。單純「先跳 dashboard 熱身」沒用，因為 Chrome 自己開起來（GPU process + renderer）也會把負載推高，形成惡性循環。
+
+**修法**：`get_driver()` 加了幾個降負載 Chrome 參數（不動 headless/UA 等會被偵測的項目）：`--renderer-process-limit=1`、`--disable-background-networking`、`--disable-sync`、`--disable-default-apps`、`--disable-client-side-phishing-detection`、`--disable-component-update`、`--disable-domain-reliability`、`--metrics-recording-only`、`--mute-audio`。加了之後在 load 6-8 左右能過驗證（雖然還是要 200-260 秒），比之前穩定很多。**如果之後又卡住，先查 `uptime`／`ps aux --sort=-%cpu`，不要照抄舊結論假設 1-5 分鐘會過。**
+
+**踩雷（我方操作失誤，已修正程式碼理解但沒改程式邏輯）**：`publish_design.py "<text>" <font> [collection]` 的第三個參數是**純字串**，不是 JSON。誤傳成 `["Life.exe Has Stopped Working"]`（照抄 meme.md 文件裡的 `["<collection name>"]` 字面寫法）會导致：(1) Redbubble 表單找不到同名 collection，略過勾選；(2) `meta["collection"]` 存進 metadata 的也是這個壞字串，後續 Pinterest 發文時 `pinterest_upload.py` 的 `board = board or meta.get("collection") or BOARD_NAME` 邏輯會拿壞字串去組 CSS selector（`[data-test-id="board-row-{board}"]`），中括號引號讓 selector 語法本身不合法，噴 `InvalidSelectorException`——而現有的 `except NoSuchElementException` 容錯接不住這種例外，整支腳本直接 crash，Pinterest 完全沒發。**以後呼叫 `publish_design.py` 第三個參數只填純 collection 名稱字串，不要加中括號引號。**
+
+事後補救：改 metadata 的 collection 欄位為乾淨字串後重跑 `publish_pinterest()` 補發成功。Redbubble 商品的 collection 分類目前**沒有**成功補標記——查證這其實是已知舊坑（上面 2026-08-04 段落記過，`/portfolio/images/<id>/edit` 頁面勾選送出不會真的存檔），沒有重新嘗試，使用者確認這兩筆不用管了：
+- https://www.redbubble.com/portfolio/images/183549729-me-at-3-pm-1-battery-no-charger-funny-t-shirt/edit
+- https://www.redbubble.com/portfolio/images/183550233-me-at-3-pm-1-battery-no-charger-funny-t-shirt/edit

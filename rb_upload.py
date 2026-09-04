@@ -85,6 +85,16 @@ def get_driver():
     options = uc.ChromeOptions()
     options.add_argument(f"--user-data-dir={PROFILE_DIR}")
     options.add_argument("--window-size=1280,900")
+    # 樹莓派資源緊繃時降低 Chrome 自身負擔（不動 headless/UA 等會被 Cloudflare 判斷的項目）
+    options.add_argument("--renderer-process-limit=1")
+    options.add_argument("--disable-background-networking")
+    options.add_argument("--disable-sync")
+    options.add_argument("--disable-default-apps")
+    options.add_argument("--disable-client-side-phishing-detection")
+    options.add_argument("--disable-component-update")
+    options.add_argument("--disable-domain-reliability")
+    options.add_argument("--metrics-recording-only")
+    options.add_argument("--mute-audio")
     driver = uc.Chrome(
         options=options,
         headless=False,

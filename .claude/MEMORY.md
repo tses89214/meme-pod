@@ -50,6 +50,16 @@
 - 2026-08-19 再補建 2 個 board（`Adult Class System`、`Life.exe Has Stopped Working`），帳號共 11 個 board。查目前 board 清單最快的方法：開 `https://www.pinterest.com/pin-builder/`，點 `[data-test-id="board-dropdown-select-button"]` 展開下拉選單，`document.body.innerText` 裡就有完整清單（比爬 `_saved`/`_created` 頁面可靠，那兩頁的 board 連結不是簡單 `<a>` 標籤，抓不到）。
 - Pinterest mockup 選圖有對比度風險：`pinterest_upload.py` 的 `get_mockup_image()` 從商品頁隨機挑一張真實照片當 pin 圖，26 種商品款式裡少數款式（如 active_tee）預設深色，黑字設計疊上去會看不到字。2026-08-19 修成依印花顏色過濾掉撞色的底色（解析 mockup URL 裡的 hex 色碼或顏色名稱，算亮度或比對關鍵字判斷深淺）。系統目前只會 pin 黑字版（白T listing，`redbubble_url` 固定存這個），所以目前只有黑字避深色底這條路徑會被用到。
 
+## 樹莓派資源競爭會讓 Chrome 卡在 Cloudflare 驗證頁（2026-09-04）
+- 這台機器同時常駐 4 個 freqtrade dryrun bot（各吃 40-70% CPU）+ 多個 claude session，只有 4 核心，load average 常態 9-14。Chrome 自動化開瀏覽器碰到 Redbubble 上傳頁的 Cloudflare 驗證時，負載一高就會真的卡死在「Verifying... Stuck? Troubleshoot」畫面（不是還在算，是 Cloudflare 自己判定異常），不是單純等久一點就會過。
+- 開 Chrome 這個動作本身（GPU process + renderer）也會把負載再推高，形成惡性循環——先降負載再開 Chrome 不夠，Chrome 自己一啟動又把負載打回高點。
+- 卡住時先查 `uptime`/`ps aux --sort=-%cpu` 判斷是不是資源競爭，不要預設等 1-5 分鐘就會過（那個結論只在負載夠低時成立）。
+- `rb_upload.py` 的 `get_driver()` 已加了幾個只降低 Chrome 自身資源佔用、不影響 Cloudflare 指紋判斷的參數（`--renderer-process-limit=1`、`--disable-background-networking`、`--disable-sync`、`--disable-default-apps`、`--disable-client-side-phishing-detection`、`--disable-component-update`、`--disable-domain-reliability`、`--metrics-recording-only`、`--mute-audio`），加了之後 load 6-8 左右能穩定過驗證（仍要等 200-260 秒屬正常）。
+
+## `publish_design.py` 第三個參數（collection）是純字串，不是 JSON（2026-09-04）
+- meme.md 範例語法 `["<collection name>"]` 容易誤讀成要傳 JSON 陣列，實際上 `sys.argv[3]` 直接當字串比對。傳成 `["Dark Tech humor"]`（含字面中括號引號）會讓 Redbubble 端 `select_collection()` 找不到同名 collection 而略過，還會把壞字串存進 `upload_metadata.json` 的 `collection` 欄位，導致 `pinterest_upload.py` 拿它組 CSS selector 時丟出 `InvalidSelectorException`（不是 `NoSuchElementException`，既有容錯接不住），整支腳本直接 crash、Pinterest 完全沒發。
+- 呼叫時第三個參數只填純名稱字串，例如 `"Dark Tech humor"`，不要加中括號或引號。
+
 ## 字型預覽遠端算圖（cjs-dev）
 - `root@cjs-dev` 已有 passwordless SSH（8 core / 15GB RAM，Debian 13 trixie），比這台 Pi 快很多，拿來跑 `quick_meme.py` 純 PIL 算圖（不需要瀏覽器/display，適合丟遠端）。
 - 遠端目錄故意用跟本機一模一樣的絕對路徑 `/home/tses89214/meme-pod/`，這樣 `.last_meme_session.json` 裡存的絕對路徑同步回本機後不用做任何轉換就能直接用（quick_meme.py 存的都是絕對路徑，見 `.last_meme_session.json` 的 `sets[].black/white`）。
