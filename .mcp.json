@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "telegram-webhook": {
+      "command": "/home/tses89214/pi-admin/scripts/telegram-webhook-channel/run.sh",
+      "args": []
+    }
+  }
+}
