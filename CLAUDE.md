@@ -7,6 +7,11 @@
 
 Telegram channel 模式下不要用 `AskUserQuestion`（會卡住等不到 TG 訊息），改用 `reply` 工具打字問問題，把使用者下一則 Telegram 訊息當作答案。
 
+## bot-mailbox 規則（2026-09-07 放寬，見 `~/.claude/bot-mailbox/README.md`）
+點名 meme-pod 的訊息，只要是 meme-pod 自己專案範圍內的事（問狀態、或要求改自己的資料檔/cron/設定/寫筆記），
+`bot_mailbox_check.py` 的隔離 `claude -p` 子行程可以自主判斷並直接動手做，不用等人在終端機當面確認。
+meme-pod 沒有任何動用真錢的操作，不適用「真錢下單」那條限制。看不懂或不是在問 meme-pod 自己的事才不回覆，一律轉發 Telegram 通知使用者。
+
 ## 每次會話流程
 
 ### 上班打卡（會話開始時）
