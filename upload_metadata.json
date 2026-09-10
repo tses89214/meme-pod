@@ -13486,7 +13486,7 @@
       "Copy, paste, pray, repeat. Tag someone who gets it. 💻"
     ],
     "uploaded": true,
-    "pinned": false,
+    "pinned": true,
     "redbubble_url": "https://www.redbubble.com/shop/ap/183283858"
   },
   {
@@ -14194,6 +14194,243 @@
     },
     "uploaded": true,
     "redbubble_url": "https://www.redbubble.com/shop/ap/183549729",
+    "collection": "Life.exe Has Stopped Working",
+    "pinned": true
+  },
+  {
+    "text": "*Coffee* /n because /n adulting /n is hard",
+    "font": "FREDOKA ONE",
+    "title": "Coffee Because Adulting Is Hard Funny T-Shirt",
+    "description": "Adulting requires caffeine, no exceptions. For anyone who needs coffee just to function like a responsible member of society.",
+    "tags": [
+      "coffee",
+      "funny",
+      "adulting",
+      "sarcastic",
+      "relatable",
+      "tired",
+      "caffeine",
+      "gift",
+      "meme",
+      "quote",
+      "office humor",
+      "self deprecating",
+      "trending",
+      "viral",
+      "coffee lover"
+    ],
+    "translations": {
+      "en": {
+        "title": "Coffee Because Adulting Is Hard Funny T-Shirt",
+        "main_tag": "coffee humor",
+        "tags": [
+          "coffee",
+          "funny",
+          "adulting",
+          "sarcastic",
+          "caffeine",
+          "gift",
+          "relatable",
+          "tired"
+        ],
+        "description": "Adulting requires caffeine, no exceptions. For anyone who needs coffee just to function like a responsible member of society."
+      },
+      "de": {
+        "title": "Kaffee Weil Erwachsensein Schwer Ist Lustiges T-Shirt",
+        "main_tag": "Kaffeehumor",
+        "tags": [
+          "Kaffee",
+          "lustig",
+          "erwachsen",
+          "sarkastisch",
+          "Geschenk"
+        ],
+        "description": "Erwachsensein braucht Koffein, keine Ausnahmen. Für alle, die Kaffee brauchen, um überhaupt zu funktionieren."
+      },
+      "fr": {
+        "title": "Café Parce Qu'être Adulte C'est Dur T-shirt Drôle",
+        "main_tag": "humour du café",
+        "tags": [
+          "café",
+          "drôle",
+          "adulte",
+          "sarcastique",
+          "cadeau"
+        ],
+        "description": "Être adulte demande de la caféine, sans exception. Pour ceux qui ont besoin de café pour tenir debout."
+      },
+      "es": {
+        "title": "Café Porque Ser Adulto Es Difícil Camiseta Graciosa",
+        "main_tag": "humor de café",
+        "tags": [
+          "café",
+          "gracioso",
+          "adulto",
+          "sarcástico",
+          "regalo"
+        ],
+        "description": "Ser adulto requiere cafeína, sin excepciones. Para quienes necesitan café solo para funcionar."
+      }
+    },
+    "uploaded": true,
+    "redbubble_url": "https://www.redbubble.com/shop/ap/183718599",
+    "collection": "Life.exe Has Stopped Working",
+    "pinned": true
+  },
+  {
+    "text": "*Espresso* /n yourself /n before you /n wreck yourself",
+    "font": "JF OPEN HUNINN",
+    "title": "Espresso Yourself Before You Wreck Yourself Funny T-Shirt",
+    "description": "A coffee pun for the caffeine-dependent. Because sometimes self-expression means one more shot of espresso.",
+    "tags": [
+      "coffee",
+      "pun",
+      "espresso",
+      "funny",
+      "caffeine",
+      "wordplay",
+      "gift",
+      "meme",
+      "quote",
+      "coffee lover",
+      "sarcastic",
+      "relatable",
+      "trending",
+      "viral",
+      "coffee humor"
+    ],
+    "translations": {
+      "en": {
+        "title": "Espresso Yourself Before You Wreck Yourself Funny T-Shirt",
+        "main_tag": "coffee pun",
+        "tags": [
+          "coffee",
+          "pun",
+          "espresso",
+          "funny",
+          "caffeine",
+          "gift",
+          "wordplay"
+        ],
+        "description": "A coffee pun for the caffeine-dependent. Because sometimes self-expression means one more shot of espresso."
+      },
+      "de": {
+        "title": "Espresso Dich Aus Bevor Du Dich Ruinierst Lustiges T-Shirt",
+        "main_tag": "Kaffee-Wortspiel",
+        "tags": [
+          "Kaffee",
+          "Espresso",
+          "lustig",
+          "Wortspiel",
+          "Geschenk"
+        ],
+        "description": "Ein Kaffee-Wortspiel für Koffeinabhängige. Manchmal bedeutet Selbstausdruck einen weiteren Espresso."
+      },
+      "fr": {
+        "title": "Expresso-Toi Avant De Craquer T-shirt Drôle",
+        "main_tag": "jeu de mots café",
+        "tags": [
+          "café",
+          "expresso",
+          "drôle",
+          "jeu de mots",
+          "cadeau"
+        ],
+        "description": "Un jeu de mots sur le café pour les accros à la caféine. Parfois s'exprimer veut dire un expresso de plus."
+      },
+      "es": {
+        "title": "Exprésate Antes De Explotar Camiseta Graciosa",
+        "main_tag": "juego de palabras café",
+        "tags": [
+          "café",
+          "expreso",
+          "gracioso",
+          "juego de palabras",
+          "regalo"
+        ],
+        "description": "Un juego de palabras cafetero para los adictos a la cafeína. A veces expresarte significa un expreso más."
+      }
+    },
+    "uploaded": true,
+    "redbubble_url": "https://www.redbubble.com/shop/ap/183718887",
+    "collection": "Life.exe Has Stopped Working",
+    "pinned": true
+  },
+  {
+    "text": "My blood /n type is /n *B-oba*",
+    "font": "FREDOKA ONE",
+    "title": "My Blood Type Is B-oba Funny Boba T-Shirt",
+    "description": "Boba runs through these veins. For the bubble tea obsessed who need it to survive the day.",
+    "tags": [
+      "boba",
+      "bubble tea",
+      "funny",
+      "pun",
+      "blood type",
+      "wordplay",
+      "gift",
+      "meme",
+      "quote",
+      "boba lover",
+      "sarcastic",
+      "relatable",
+      "trending",
+      "viral",
+      "tea humor"
+    ],
+    "translations": {
+      "en": {
+        "title": "My Blood Type Is B-oba Funny Boba T-Shirt",
+        "main_tag": "boba pun",
+        "tags": [
+          "boba",
+          "bubble tea",
+          "funny",
+          "pun",
+          "blood type",
+          "gift"
+        ],
+        "description": "Boba runs through these veins. For the bubble tea obsessed who need it to survive the day."
+      },
+      "de": {
+        "title": "Meine Blutgruppe Ist B-oba Lustiges T-Shirt",
+        "main_tag": "Boba-Wortspiel",
+        "tags": [
+          "Boba",
+          "Bubble Tea",
+          "lustig",
+          "Wortspiel",
+          "Geschenk"
+        ],
+        "description": "Boba fließt durch diese Adern. Für alle Bubble-Tea-Fans, die es zum Überleben brauchen."
+      },
+      "fr": {
+        "title": "Mon Groupe Sanguin Est B-oba T-shirt Drôle",
+        "main_tag": "jeu de mots boba",
+        "tags": [
+          "boba",
+          "bubble tea",
+          "drôle",
+          "jeu de mots",
+          "cadeau"
+        ],
+        "description": "Le boba coule dans ces veines. Pour les fans de bubble tea qui en ont besoin pour tenir la journée."
+      },
+      "es": {
+        "title": "Mi Tipo De Sangre Es B-oba Camiseta Graciosa",
+        "main_tag": "juego de palabras boba",
+        "tags": [
+          "boba",
+          "bubble tea",
+          "gracioso",
+          "juego de palabras",
+          "regalo"
+        ],
+        "description": "El boba corre por estas venas. Para los fans del bubble tea que lo necesitan para sobrevivir el día."
+      }
+    },
+    "uploaded": true,
+    "redbubble_url": "https://www.redbubble.com/shop/ap/183719103",
     "collection": "Life.exe Has Stopped Working",
     "pinned": true
   }

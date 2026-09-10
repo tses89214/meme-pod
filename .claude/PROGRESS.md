@@ -1,5 +1,17 @@
 # PROGRESS
 
+## 目前狀態（2026-09-10）
+語錄批次 3 個新設計（Coffee/Espresso/Boba 主題），全部走完 `/meme` 全流程（collection 都選 Life.exe Has Stopped Working），3/3 全部成功：
+1. Coffee Because Adulting Is Hard（font fredoka）：白 https://www.redbubble.com/shop/ap/183718599 / 黑 https://www.redbubble.com/shop/ap/183718759
+2. Espresso Yourself Before You Wreck Yourself（font huninn）：白 https://www.redbubble.com/shop/ap/183718887 / 黑 https://www.redbubble.com/shop/ap/183718961
+3. My Blood Type Is B-oba（font fredoka）：白 https://www.redbubble.com/shop/ap/183719103 / 黑 https://www.redbubble.com/shop/ap/183719181
+
+全站累計 135 個設計。
+
+**驗證了新功能**：pi-admin 的 Telegram `reply` 工具新加的 `photo_path` 參數這次確認可用（session 重啟後生效），字型預覽圖直接用 `reply` 工具傳圖給使用者，不用再卡在「TG 傳不了圖」的舊限制（見 `reference_reply_photo_path.md`）。
+
+**踩雷重申**：互動 shell 手動跑 `rb_upload.py` / `publish_design.py` 忘記帶 `DISPLAY=:0 XDG_RUNTIME_DIR=/run/user/1000` 又撞了一次 `SessionNotCreatedException`，補上就正常（跟 2026-08-20 那次一樣的根因，crontab 排程都有帶、只有手動跑會忘）。
+
 ## 目前狀態（2026-09-02）
 語錄/趨勢批次的 4 個新設計走完 `/meme` 全流程（Redbubble 黑白版 + Pinterest，4/4 全部成功）：
 1. Snack First Summit Second（font genyogot, collection 預設 Dark Tech humor）：白 https://www.redbubble.com/shop/ap/183498805 / 黑 https://www.redbubble.com/shop/ap/183499015
