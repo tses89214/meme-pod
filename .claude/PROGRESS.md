@@ -1,5 +1,17 @@
 # PROGRESS
 
+## 目前狀態（2026-09-11）
+每週語錄搜尋 8 句送出，使用者挑第 1、7、8 句，走完 `/meme` 全流程，3/3 全部成功：
+1. Adulting Not Recommended（font unifont，collection Adult Class System）：白 https://www.redbubble.com/shop/ap/183746909 / 黑 https://www.redbubble.com/shop/ap/183747110
+2. I'm Not Lagging I'm Just Thinking（font anton，collection Dark Tech humor）：白 https://www.redbubble.com/shop/ap/183747370 / 黑 https://www.redbubble.com/shop/ap/183747542
+3. 90% Coffee 10% Hope（font oswald，collection Dark Tech humor）：白 https://www.redbubble.com/shop/ap/183747863 / 黑 https://www.redbubble.com/shop/ap/183748060
+
+全站累計 138 個設計。Google Drive 備份（`drive_upload.py batch`）仍卡在舊 token `invalid_grant`，這次沿用近期做法直接跳過未跑。
+
+**新踩雷**：`.rb_chrome_profile/SingletonLock` 這次是指向已死 PID 的殘留鎖（`ps aux` 確認排程沒在跑、chrome process 也不在），不是 08-20 那次的 DISPLAY 環境變數問題——兩種都會丟一樣的 `SessionNotCreatedException: cannot connect to chrome`，要分開排查（先 `ps aux` 排除排程佔用，再看 `DISPLAY` 有沒有值，最後才排查殘留 lock file 是否指向死 PID，都不是才需要更深入查）。清掉 `SingletonLock`/`SingletonSocket`/`SingletonCookie` 三個檔案後 `rb_upload.py collections` 正常連上。
+
+**多設計連續跑的新流程**：3 個設計改用「background publish + 用 `while kill -0 <pid>; do sleep; done` 串鏈下一個」的方式排隊執行，同時把下一個設計的字型預覽圖丟給使用者選，省掉乾等時間。但踩到一次新雷：串鏈 script 是等前一個 process **完全退出**才起跑，而 `publish_design.py` 讀 `.last_meme_session.json` 是在起跑當下才讀（不是排隊當下），如果在它真正啟動前又重新 render 下一個設計的字型預覽圖（會覆寫同一份 session 檔案），排隊中的那個發布就會讀到錯的文字。這次在覆寫後、串鏈還沒觸發前就發現並修正（殺掉串鏈、重新 render 回正確文字、重新排隊），沒有造成錯誤發布，但**教訓：多設計排隊發布時，只有在確認「下一個發布已經印出開頭的『發布：...』字樣」（代表已經讀完 session）之後，才能安全地覆寫 session 檔案去 render 再下一個的字型預覽**，不能只看「前一個 process 還在跑」就假設安全。
+
 ## 目前狀態（2026-09-10）
 語錄批次 3 個新設計（Coffee/Espresso/Boba 主題），全部走完 `/meme` 全流程（collection 都選 Life.exe Has Stopped Working），3/3 全部成功：
 1. Coffee Because Adulting Is Hard（font fredoka）：白 https://www.redbubble.com/shop/ap/183718599 / 黑 https://www.redbubble.com/shop/ap/183718759
