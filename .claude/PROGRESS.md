@@ -1,5 +1,8 @@
 # PROGRESS
 
+## 目前狀態（2026-09-25）
+Dark Tech humor 系列 8 個新設計全部發完（Redbubble + Pinterest，metadata 皆有 `redbubble_url` 且 `pinned`）：IT WORKS on my machine（huninn）、CTRL+ALT+DEL my problems（unifont）、CTRL+Z my life（genyogot）、404 motivation not found（cubic11）、No Bugs Just Undocumented Features（cubic11）、SUDO make me coffee（huninn）、COMPILING... please wait（caveat）、IT WORKS on my laptop（huninn）。全站累計 146 個設計。前一個 session 發完沒 commit，09-26 補 commit。`_manual_login.py`（手動過 Cloudflare 登入用）仍刻意不進 git。
+
 ## 目前狀態（2026-09-11）
 每週語錄搜尋 8 句送出，使用者挑第 1、7、8 句，走完 `/meme` 全流程，3/3 全部成功：
 1. Adulting Not Recommended（font unifont，collection Adult Class System）：白 https://www.redbubble.com/shop/ap/183746909 / 黑 https://www.redbubble.com/shop/ap/183747110
