@@ -1,5 +1,8 @@
 # PROGRESS
 
+## 目前狀態（2026-10-07）
+10-05 批次 13 個設計：前 8 個（Oh Deer/Social Battery/No Beef/Bedazzled/Chunky Clogs/Wine/Divorce/Dad-A-Base）早已發完；後 5 個中 ADULTING（oswald）、DO IT TIRED（fredoka）、NOW SINGLE（fredoka）、BIKES（bebas）今天補發完（Redbubble + Pinterest），THE PLANTS 使用者不要了。全站累計 158 個設計。NOW SINGLE 白版 description_en 欄位 click intercepted（被 tag 建議蓋住），商品有建立，英文描述可能沒填，待確認。
+
 ## 目前狀態（2026-09-25）
 Dark Tech humor 系列 8 個新設計全部發完（Redbubble + Pinterest，metadata 皆有 `redbubble_url` 且 `pinned`）：IT WORKS on my machine（huninn）、CTRL+ALT+DEL my problems（unifont）、CTRL+Z my life（genyogot）、404 motivation not found（cubic11）、No Bugs Just Undocumented Features（cubic11）、SUDO make me coffee（huninn）、COMPILING... please wait（caveat）、IT WORKS on my laptop（huninn）。全站累計 146 個設計。前一個 session 發完沒 commit，09-26 補 commit。`_manual_login.py`（手動過 Cloudflare 登入用）仍刻意不進 git。
 
