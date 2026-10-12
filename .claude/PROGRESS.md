@@ -230,3 +230,7 @@ Redbubble + Pinterest 全自動管線穩定運作中。目前 79 個設計，全
 事後補救：改 metadata 的 collection 欄位為乾淨字串後重跑 `publish_pinterest()` 補發成功。Redbubble 商品的 collection 分類目前**沒有**成功補標記——查證這其實是已知舊坑（上面 2026-08-04 段落記過，`/portfolio/images/<id>/edit` 頁面勾選送出不會真的存檔），沒有重新嘗試，使用者確認這兩筆不用管了：
 - https://www.redbubble.com/portfolio/images/183549729-me-at-3-pm-1-battery-no-charger-funny-t-shirt/edit
 - https://www.redbubble.com/portfolio/images/183550233-me-at-3-pm-1-battery-no-charger-funny-t-shirt/edit
+
+## 2026-10-12 — 發布 4 個新設計
+ALONE（oswald, Life.exe）、WINE（caveat, Life.exe）、KIBBLES（pacifico, Paw Prints & Puns）、INDOOR CAT（caveat, Paw Prints & Puns），各白黑兩商品 + Pinterest 成功，全站累計 150 個設計。
+**踩雷**：等前一個 publish 結束時，`while ps aux | grep ...` 的 pattern 會匹配自己整行指令造成死等，`pkill -f` 同理會殺到自己的 shell。改用 `pgrep -a python3 | grep publish_design` 取 PID 再 `kill -0` 等。
