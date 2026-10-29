@@ -9,6 +9,7 @@ pinterest_explore_like.py — 每天隨機愛心幾個 Pinterest 首頁上其他
   python pinterest_explore_like.py [n]   # n 沒給預設隨機 45-55 個
 """
 
+import signal
 import sys
 import time
 import random
@@ -61,7 +62,11 @@ def react_one(driver, url: str) -> str:
 
 def main():
     n = int(sys.argv[1]) if len(sys.argv) > 1 else random.randint(45, 55)
+    # cron 的 timeout 送 SIGTERM 時走 finally，確保 chromium 一起關
+    signal.signal(signal.SIGTERM, lambda *_: sys.exit(1))
     driver = get_driver()
+    driver.command_executor.set_timeout(60)  # get_driver 預設 600s，這支腳本不需要
+    driver.set_page_load_timeout(45)
     try:
         candidates = collect_pin_links(driver)
         if not candidates:
