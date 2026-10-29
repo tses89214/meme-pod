@@ -80,7 +80,7 @@ def find_design_images(text: str) -> dict:
     return result
 
 
-def get_driver():
+def get_driver(no_images=False):
     import undetected_chromedriver as uc
     options = uc.ChromeOptions()
     options.add_argument(f"--user-data-dir={PROFILE_DIR}")
@@ -95,6 +95,11 @@ def get_driver():
     options.add_argument("--disable-domain-reliability")
     options.add_argument("--metrics-recording-only")
     options.add_argument("--mute-audio")
+    options.add_argument("--js-flags=--max-old-space-size=256")
+    options.add_argument("--disable-extensions")
+    options.add_argument("--disable-gpu")
+    if no_images:  # 只點愛心不需要圖，renderer 記憶體可少一大截
+        options.add_argument("--blink-settings=imagesEnabled=false")
     driver = uc.Chrome(
         options=options,
         headless=False,

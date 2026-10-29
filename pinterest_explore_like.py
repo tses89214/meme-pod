@@ -64,7 +64,7 @@ def main():
     n = int(sys.argv[1]) if len(sys.argv) > 1 else random.randint(45, 55)
     # cron 的 timeout 送 SIGTERM 時走 finally，確保 chromium 一起關
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(1))
-    driver = get_driver()
+    driver = get_driver(no_images=True)
     driver.command_executor.set_timeout(60)  # get_driver 預設 600s，這支腳本不需要
     driver.set_page_load_timeout(45)
     try:
