@@ -39,7 +39,12 @@ CURATION_PROMPT = """以下是今天的兩份原始素材，給梗圖 T 恤（Re
 === 素材二：Tavily 搜到的英文語錄候選（跨搞怪/毒舌/正向/自嘲等類別）===
 {quote_candidates}
 
+=== 已做過的設計（文案或同梗都不要再出）===
+{done}
+
 規則：
+- 凡是與「已做過的設計」相同或同梗（換句話說、換個字眼也算）的，一律剔除並用其他候選
+  補足，不要列出已剔除的
 - Pinterest 趨勢大多是時尚/美妝/居家類，不會直接對應，找出「能不能延伸出一句適合印
   T 恤的搞笑/雙關/自嘲文案」，找不到就跳過，不用湊數，最多給 5 個
 - 語錄候選挑 5-8 句最適合印在 T 恤上的：要短、有記憶點、好笑或有共鳴，跳過老套陳腔
@@ -71,9 +76,16 @@ def search_quote_candidates() -> str:
     return "\n\n".join(parts)
 
 
+def load_done() -> str:
+    import json
+    items = json.loads((BASE_DIR / "upload_metadata.json").read_text(encoding="utf-8"))
+    return "\n".join(sorted({x["text"].replace("\n", " ") for x in items if x.get("text")}))
+
+
 def run_curation(trends_text: str, quote_candidates: str) -> str:
     prompt = CURATION_PROMPT.format(
         trends_text=trends_text[:4000], quote_candidates=quote_candidates,
+        done=load_done(),
     )
     result = subprocess.run(
         ["/home/tses89214/.local/bin/claude", "-p", prompt,

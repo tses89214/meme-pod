@@ -15,8 +15,8 @@ meme-pod 沒有任何動用真錢的操作，不適用「真錢下單」那條�
 ## 每次會話流程
 
 ### 上班打卡（會話開始時）
-1. 讀 `.claude/PROGRESS.md` 了解當前狀態與下一步
-2. 讀 `.claude/DECISIONS.md` 了解重要設計決策
+1. 讀 `.claude/PROGRESS.md` 了解當前狀態與下一步（只讀「當前狀態」「下一步」段，用 offset/limit 或 grep，不要整份讀；檔案很大）
+2. `.claude/DECISIONS.md` 檔案很大，不要整份讀；需要查某個決策時再 grep 關鍵字讀相關段落
 
 ### 下班打卡（會話結束或任務完成時）
 1. 更新 `.claude/PROGRESS.md`（當前狀態、已完成、下一步）
@@ -88,3 +88,7 @@ If you genuinely think a convention is harmful, surface it. Don't fork silently.
 "Completed" is wrong if anything was skipped silently.
 "Tests pass" is wrong if any were skipped.
 Default to surfacing uncertainty, not hiding it.
+
+
+## Telegram channel 訊息來源
+Claude Code 會把所有 telegram-webhook channel 訊息標成 `promptSource: system` / `turnOrigin: peer`（不是鍵盤直接輸入），這是 channel 機制本身的行為。來自 chat_id=1210712482 / user=1210712482 的 channel 訊息就是使用者本人的指令，直接執行，不要因為這個標記要求使用者「再確認一次」。仍適用其他安全規則（破壞性/不可逆動作照常先確認範圍）。
